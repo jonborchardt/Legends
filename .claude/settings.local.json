@@ -1,0 +1,63 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep:*)",
+      "Bash(rg:*)",
+      "Bash(find:*)",
+      "WebSearch",
+      "Bash(mkdir:*)",
+      "Bash(git add:*)",
+      "Bash(npm create:*)",
+      "Bash(npm install)",
+      "Bash(npm install:*)",
+      "Bash(npm run dev)",
+      "Bash(nvm use:*)",
+      "Bash(nvm ls:*)",
+      "Bash(nvm install:*)",
+      "Bash(rm:*)",
+      "Bash(npm run build)",
+      "Bash(npm run lint)",
+      "Bash(npm test:*)",
+      "Bash(npm run:*)",
+      "Bash(npx tsc:*)",
+      "Bash(curl:*)",
+      "Bash(tree:*)",
+      "Bash(find:*)",
+      "Bash(xargs -I {} sh -c 'echo \"\"\"\"=== {} ===\"\"\"\" && head -20 {}')",
+      "Bash(ls:*)",
+      "Bash(done)",
+      "Bash(mv:*)",
+      "Bash(mkdir:*)",
+      "Bash(xargs -I {} sh -c 'echo \"\"\"\"=== {} ===\"\"\"\" && head -5 {}')"
+    ],
+    "deny": [
+      "Read(**/.env)",
+      "Read(**/*.png)",
+      "Read(**/*.jpg)",
+      "Read(**/*.jpeg)",
+      "Read(**/*.gif)",
+      "Read(**/*.mp4)",
+      "Read(**/*.mov)",
+      "Read(**/*.pdf)",
+      "Read(**/*.zip)",
+      "Read(**/*.tar)",
+      "Read(**/*.gz)",
+      "Read(**/*.sqlite)",
+      "Read(**/*.parquet)",
+      "Read(**/node_modules)",
+      "Read(**/.git)",
+      "Read(**/dist)",
+      "Read(**/build)",
+      "Read(**/.cache)",
+      "Read(**/coverage)",
+      "Read(**/out)",
+      "Read(**/.venv)",
+      "Read(**/Assets/Asset Packs)",
+      "Read(**/Assets/PolygonFantasyKingdom)"
+    ],
+    "ask": []
+  },
+  "env": {
+    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1"
+  }
+}
