@@ -19,6 +19,7 @@ namespace Legends.UI
 
         public void OnNewGameClicked()
         {
+            Debug.Log("[MainMenu] OnNewGameClicked fired");
             var state = new GameState
             {
                 SaveVersion     = "1.0",
@@ -26,6 +27,7 @@ namespace Legends.UI
                 CompletedEvents = new List<EventResult>()
             };
             _saveService.Save(state);
+            Debug.Log("[MainMenu] Save complete, going to TeamHub");
             SceneFlow.GoToTeamHub();
         }
 

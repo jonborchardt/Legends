@@ -2,7 +2,8 @@
     "name": "Legends.Services",
     "rootNamespace": "Legends.Services",
     "references": [
-        "Legends.Data"
+        "Legends.Data",
+        "Unity.InputSystem"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
