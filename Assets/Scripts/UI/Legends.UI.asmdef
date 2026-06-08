@@ -4,7 +4,8 @@
     "references": [
         "Legends.Data",
         "Legends.Services",
-        "Legends.Simulation"
+        "Legends.Simulation",
+        "Unity.TextMeshPro"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
