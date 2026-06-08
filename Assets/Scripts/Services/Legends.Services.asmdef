@@ -1,0 +1,16 @@
+{
+    "name": "Legends.Services",
+    "rootNamespace": "Legends.Services",
+    "references": [
+        "Legends.Data"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -6,28 +6,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Olympic Manager MVP — a WebGL game on GitHub Pages. Player manages a fantasy athletic team and watches a 3D replay of a simulated Dragon Egg Relay event. Unity project targeting WebGL, no backend.
 
-## All Work Flows Through /Plans
-
-Every implementation task has a corresponding plan file. Before writing any code:
-
-1. Read [Plans/MASTER.md](Plans/MASTER.md) to understand project status and what is unlocked.
-2. Find the relevant sub-sub-plan (e.g. `Plans/4.3.1-Load-And-Spawn.md`) and read it fully.
-3. Implement exactly what the plan specifies — no more, no less.
-4. After completing a task, update the Status column in `Plans/MASTER.md` to `✅ done`.
-
-Do not implement anything that does not have a plan file. If a task seems necessary but has no plan, say so and stop.
-
-## Plan Hierarchy
-
-```
-Plans/MASTER.md              ← overall status tracker and dependency graph
-Plans/1-Foundation.md        ← chunk overview with sub-plan index
-Plans/1.1-Folder-Structure.md  ← mid-level plan
-Plans/1.1.1-Create-Directories.md  ← atomic task (implement from this)
-```
-
-Always read the atomic sub-sub-plan before implementing. The chunk and mid-level files provide context but the atomic file is the spec.
-
 ## Architectural Non-Negotiables
 
 These rules are absolute. Never violate them:
@@ -139,3 +117,6 @@ All under `Resources/Meshes/` for `Resources.Load` at runtime.
 **Species/Humans/** — 10 base bodies (`SK_HUMN_BASE_01`–`10`), each with: hair, eyebrows, ears, face, nose, teeth, tongue
 
 **Outfits/FantasyKnights/** — 3 knight sets (`SK_FANT_KNGT_01`–`03`): torso, upper/lower arms, hands, hips, legs, feet, helmet (front/back/sides), back plate, shoulder/elbow/knee pads
+
+Always check `Assets/Asset Packs/Synty/` for models, animations, effects, and UI elements before creating placeholders. See memory for details.
+

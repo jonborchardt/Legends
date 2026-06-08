@@ -1,0 +1,19 @@
+{
+    "name": "Legends.UI",
+    "rootNamespace": "Legends.UI",
+    "references": [
+        "Legends.Data",
+        "Legends.Services",
+        "Legends.Simulation",
+        "Unity.TextMeshPro"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

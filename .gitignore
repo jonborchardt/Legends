@@ -60,7 +60,9 @@ crashlytics-build.properties
 
 # Ignoring all asset packs for now, this wont work long term
 /[Aa]ssets/[Aa]sset Packs/
+/[Aa]ssets/Synty
 
 /[Aa]ssets/Photos/
+
 /Assets/Synty/
 /Plans
