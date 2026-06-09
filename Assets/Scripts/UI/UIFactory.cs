@@ -1,3 +1,40 @@
+// PRIMITIVE WIDGET LIBRARY — all programmatic UI is built from these calls.
+//
+// WHAT EACH METHOD PRODUCES
+//   CreateCanvas(name)
+//       Root Canvas GO (ScreenSpaceOverlay, 1920×1080 reference, GraphicRaycaster).
+//       Parented to ScreenRegistry.CanvasParent. Adds EventSystem if none exists.
+//
+//   CreatePanel(parent, name, color)
+//       Plain Image GO. No layout. Caller sizes via RectTransform or FillParent().
+//
+//   CreateVerticalGroup(parent, name, spacing)       →  VLG + ContentSizeFitter (vertical)
+//   CreateHorizontalGroup(parent, name, spacing)     →  HLG + ContentSizeFitter (horizontal)
+//       Auto-sizing stacks. Caller must Destroy(CSF) if the group is anchor-sized instead.
+//
+//   CreateScrollView(parent, name, out content)
+//       Viewport+Mask → Content (VLG+CSF top-anchored). Returns scroll GO; use `content`
+//       as the parent for child items.
+//
+//   CreateText(parent, name, text, fontSize)
+//       TMP label, TextPrimary colour, MidlineLeft. Height = fontSize × 1.5, minHeight set.
+//
+//   CreateButton(parent, name, label, onClick)
+//       Accent-coloured Image + Button. Label centred in Background colour. minHeight 60 px.
+//
+//   CreateImage(parent, name, color)
+//       Bare Image GO. No sizing — caller controls RectTransform.
+//
+//   CreateSlider(parent, name, min, max, value)
+//       Read-only stat bar. Background = StatBarBackground, fill = StatBarFill. Height 20 px.
+//       [ ████████░░ ]
+//
+//   FillParent(rt)          — anchors 0,0 → 1,1, offsets zeroed (stretch to parent).
+//   SetAnchored(rt, …)      — point-anchor + explicit sizeDelta for floating elements.
+//
+// GOAL: Screens and factories never touch Unity UI components directly — they compose
+// from these calls so layout behaviour stays consistent and easy to change in one place.
+
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Events;

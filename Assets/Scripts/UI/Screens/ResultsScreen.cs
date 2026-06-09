@@ -1,3 +1,24 @@
+// VISUAL LAYOUT
+// ┌─────────────────────────────┐
+// │  Results                    │  ← title, pinned top (80px)
+// ├─────────────────────────────┤
+// │  Final Standings            │  ← section header
+// │  1. Athlete Name            │  ← ResultRow per placement
+// │  2. Athlete Name            │
+// │  3. ...                     │
+// │                             │
+// │  Highlights                 │  ← section header (shown only if notable events exist)
+// │  Someone dropped the egg!   │  ← up to 3 EggDrop / Surge / Stumble events,
+// │  Someone surged ahead!      │    colour-coded (red / green / secondary)
+// │  ...                        │
+// ├─────────────────────────────┤
+// │  [ Back to Team ]           │  ← full-width button, pinned bottom (80px)
+// └─────────────────────────────┘
+//
+// GOAL: Show race outcome after the 3D replay.
+// Reads GameSession.LatestResult — rebuilt on every Show() so it's always fresh.
+// "Back to Team" returns the player to TeamHubScreen to run another event.
+
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -7,7 +28,6 @@ using Legends.Services;
 
 namespace Legends.UI
 {
-    // Rebuilds on every Show() so it always reflects the latest race result.
     public class ResultsScreen : UIScreen
     {
         public override void Show()
@@ -56,21 +76,22 @@ namespace Legends.UI
             btnRt.offsetMin = new Vector2(16, 8);
             btnRt.offsetMax = new Vector2(-16, FooterH - 8);
 
-            // Scroll — fills between title and button
-            Transform scrollContent;
-            var scroll   = UIFactory.CreateScrollView(root.transform, "Scroll", out scrollContent);
-            var scrollRt = scroll.GetComponent<RectTransform>();
-            scrollRt.anchorMin = Vector2.zero;
-            scrollRt.anchorMax = Vector2.one;
-            scrollRt.offsetMin = new Vector2(0, FooterH);
-            scrollRt.offsetMax = new Vector2(0, -HeaderH);
+            // Content area — fills between title and button, no scroll/mask needed for 4-6 athletes
+            var bodyGo = UIFactory.CreateVerticalGroup(root.transform, "Body", spacing: 8f);
+            Object.Destroy(bodyGo.GetComponent<UnityEngine.UI.ContentSizeFitter>());
+            var bodyRt = bodyGo.GetComponent<RectTransform>();
+            bodyRt.anchorMin = new Vector2(0, 0);
+            bodyRt.anchorMax = new Vector2(1, 1);
+            bodyRt.offsetMin = new Vector2(0, FooterH);
+            bodyRt.offsetMax = new Vector2(0, -HeaderH);
+            var body = bodyGo.transform;
 
             // Rankings
-            UIFactory.CreateText(scrollContent, "RankingsHeader", "Final Standings", UIStyle.FontSection);
+            CreateLabel(body, "RankingsHeader", "Final Standings", UIStyle.FontSection);
             for (int i = 0; i < result.Placements.Count; i++)
             {
                 string name = nameMap.GetValueOrDefault(result.Placements[i], "Unknown");
-                ResultRowFactory.Create(scrollContent, name, i + 1);
+                ResultRowFactory.Create(body, name, i + 1);
             }
 
             // Highlights
@@ -81,17 +102,30 @@ namespace Legends.UI
 
             if (notable.Count > 0)
             {
-                UIFactory.CreateText(scrollContent, "EventsHeader", "Highlights", UIStyle.FontSection);
+                CreateLabel(body, "EventsHeader", "Highlights", UIStyle.FontSection);
                 foreach (var evt in notable)
                 {
-                    string name = nameMap.GetValueOrDefault(evt.AthleteId, "Someone");
-                    string text = FormatEvent(evt.EventType, name);
-                    var lbl = UIFactory.CreateText(scrollContent, $"Evt_{evt.EventType}", text, UIStyle.FontBody);
+                    string evtName = nameMap.GetValueOrDefault(evt.AthleteId, "Someone");
+                    string text    = FormatEvent(evt.EventType, evtName);
+                    var lbl = CreateLabel(body, $"Evt_{evt.EventType}", text, UIStyle.FontBody);
                     lbl.color = EventColor(evt.EventType);
                 }
             }
 
             return canvas;
+        }
+
+        static TextMeshProUGUI CreateLabel(Transform parent, string name, string text, float fontSize)
+        {
+            var panel   = UIFactory.CreatePanel(parent, name, Color.clear);
+            var panelRt = panel.GetComponent<RectTransform>();
+            panelRt.sizeDelta = new Vector2(0, fontSize * 1.5f);
+            panel.AddComponent<UnityEngine.UI.LayoutElement>().minHeight = fontSize * 1.5f;
+
+            var tmp   = UIFactory.CreateText(panel.transform, "Lbl", text, fontSize);
+            var tmpRt = tmp.GetComponent<RectTransform>();
+            UIFactory.FillParent(tmpRt);
+            return tmp;
         }
 
         static Dictionary<string, string> BuildNameMap(GameState state)

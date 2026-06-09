@@ -1,4 +1,18 @@
+// VISUAL OUTPUT — one card per athlete, stacked vertically in a scroll view:
+// ┌───────────────────────────────────┐
+// │  Athlete Name                     │  ← FontSection
+// │  DEX  [████████░░]                │  ← stat label + slider bar (0–10)
+// │  CON  [██████░░░░]                │
+// │  FOC  [█████████░]                │
+// │  STR  [███░░░░░░░]                │
+// │  LCK  [████░░░░░░]                │
+// └───────────────────────────────────┘
+//
+// GOAL: Render a single athlete's identity and stats as a self-sizing card.
+// Card height is content-driven (ContentSizeFitter). Caller owns placement in a scroll view.
+
 using UnityEngine;
+using UnityEngine.UI;
 using Legends.Data;
 
 namespace Legends.UI
@@ -7,37 +21,52 @@ namespace Legends.UI
     {
         public static GameObject Create(Transform parent, AthleteState athlete)
         {
-            var card   = UIFactory.CreatePanel(parent, $"Card_{athlete.Name}", UIStyle.Surface);
-            var cardRt = card.GetComponent<RectTransform>();
-            cardRt.sizeDelta = new Vector2(0, 160f);
-            card.AddComponent<UnityEngine.UI.LayoutElement>().minHeight = 160f;
+            // VLG + CSF live directly on the card panel — no inner GameObject, no deferred-destroy conflict.
+            var card = UIFactory.CreatePanel(parent, $"Card_{athlete.Name}", UIStyle.Surface);
 
-            var layout = UIFactory.CreateVerticalGroup(card.transform, "Layout", spacing: 4f);
-            var layoutRt = layout.GetComponent<RectTransform>();
-            UIFactory.FillParent(layoutRt);
-            Object.Destroy(layout.GetComponent<UnityEngine.UI.ContentSizeFitter>());
+            var vl = card.AddComponent<VerticalLayoutGroup>();
+            vl.spacing               = 4f;
+            vl.childControlWidth     = true;
+            vl.childControlHeight    = true;
+            vl.childForceExpandWidth  = true;
+            vl.childForceExpandHeight = false;
+            vl.padding = new RectOffset(16, 16, 16, 16);
 
-            UIFactory.CreateText(layout.transform, "Name", athlete.Name, UIStyle.FontSection);
+            card.AddComponent<ContentSizeFitter>().verticalFit =
+                ContentSizeFitter.FitMode.PreferredSize;
 
-            AddStatRow(layout.transform, "DEX", athlete.Stats.Dexterity);
-            AddStatRow(layout.transform, "CON", athlete.Stats.Constitution);
-            AddStatRow(layout.transform, "FOC", athlete.Stats.Focus);
-            AddStatRow(layout.transform, "STR", athlete.Stats.Strength);
-            AddStatRow(layout.transform, "LCK", athlete.Stats.Luck);
+            UIFactory.CreateText(card.transform, "Name", athlete.Name, UIStyle.FontSection);
+
+            AddStatRow(card.transform, "DEX", athlete.Stats.Dexterity);
+            AddStatRow(card.transform, "CON", athlete.Stats.Constitution);
+            AddStatRow(card.transform, "FOC", athlete.Stats.Focus);
+            AddStatRow(card.transform, "STR", athlete.Stats.Strength);
+            AddStatRow(card.transform, "LCK", athlete.Stats.Luck);
 
             return card;
         }
 
         static void AddStatRow(Transform parent, string label, int value)
         {
-            var row = UIFactory.CreateHorizontalGroup(parent, $"Row_{label}", spacing: 8f);
-            Object.Destroy(row.GetComponent<UnityEngine.UI.ContentSizeFitter>());
-            row.AddComponent<UnityEngine.UI.LayoutElement>().minHeight = 22f;
+            // Build the row directly — no factory CSF to destroy, no deferred issues.
+            var row = new GameObject($"Row_{label}");
+            row.transform.SetParent(parent, false);
+
+            var hg = row.AddComponent<HorizontalLayoutGroup>();
+            hg.spacing               = 8f;
+            hg.childControlWidth     = true;
+            hg.childControlHeight    = true;
+            hg.childForceExpandWidth  = false;
+            hg.childForceExpandHeight = true;
+            hg.padding = new RectOffset(0, 0, 0, 0);
+
+            row.AddComponent<LayoutElement>().minHeight = 22f;
 
             var lbl = UIFactory.CreateText(row.transform, "Label", label, UIStyle.FontSmall);
-            lbl.GetComponent<UnityEngine.UI.LayoutElement>().minWidth = 50f;
+            lbl.GetComponent<LayoutElement>().minWidth = 50f;
 
-            UIFactory.CreateSlider(row.transform, "Bar", 0f, 10f, value);
+            var slider = UIFactory.CreateSlider(row.transform, "Bar", 0f, 10f, value);
+            slider.GetComponent<LayoutElement>().flexibleWidth = 1f;
         }
     }
 }

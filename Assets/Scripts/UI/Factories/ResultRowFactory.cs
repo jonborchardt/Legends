@@ -1,3 +1,11 @@
+// VISUAL OUTPUT — one fixed-height row per placement:
+// ┌────────────────────────────────────┐
+// │  1st   │  Athlete Name            │  ← rank (80px min-width) + name, 56px tall
+// └────────────────────────────────────┘  background: Accent for 1st, Surface for 2–3, Background otherwise
+//
+// GOAL: Render a single race placement entry inside the Results screen body.
+// Caller creates one row per entry in EventResult.Placements, top to bottom.
+
 using UnityEngine;
 using Legends.Data;
 

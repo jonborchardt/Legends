@@ -1,3 +1,22 @@
+// VISUAL LAYOUT
+// ┌─────────────────────────────┐
+// │  Team Name                  │  ← title, pinned top (80px)
+// ├─────────────────────────────┤
+// │  ┌─── AthleteCard ───────┐  │
+// │  │ Name · Speed · Endur  │  │  ← one card per roster athlete,
+// │  └───────────────────────┘  │    scrollable vertical list
+// │  ┌─── AthleteCard ───────┐  │
+// │  │ ...                   │  │
+// │  └───────────────────────┘  │
+// │           ...               │
+// ├─────────────────────────────┤
+// │  [ Run Event ]              │  ← full-width button, pinned bottom (80px)
+// └─────────────────────────────┘
+//
+// GOAL: Show the player their roster before committing to a race.
+// "Run Event" simulates the Dragon Egg Relay, saves the result, and navigates to Replay3D.
+// Rebuilt on every Show() so it always reflects the current save state.
+
 using UnityEngine;
 using Legends.Data;
 using Legends.Services;
@@ -9,6 +28,17 @@ namespace Legends.UI
     {
         const float HeaderH = 80f;
         const float FooterH = 80f;
+
+        // Rebuild every time it's shown so roster reflects current save data.
+        public override void Show()
+        {
+            if (IsBuilt)
+            {
+                Object.Destroy(Root);
+                Root = null;
+            }
+            base.Show();
+        }
 
         protected override GameObject Build()
         {
@@ -33,8 +63,7 @@ namespace Legends.UI
             titleRt.offsetMax = new Vector2(-16, 0);
 
             // Scroll — fills space between header and footer
-            Transform scrollContent;
-            var scroll   = UIFactory.CreateScrollView(root.transform, "Scroll", out scrollContent);
+            var scroll   = UIFactory.CreateScrollView(root.transform, "Scroll", out var scrollContent);
             var scrollRt = scroll.GetComponent<RectTransform>();
             scrollRt.anchorMin = Vector2.zero;
             scrollRt.anchorMax = Vector2.one;

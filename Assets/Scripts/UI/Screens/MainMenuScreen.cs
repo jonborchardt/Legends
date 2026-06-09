@@ -1,3 +1,19 @@
+// VISUAL LAYOUT
+// ┌─────────────────────────────┐
+// │                             │
+// │                             │
+// │     Dragon Egg Relay        │  ← large title
+// │     Olympic Manager         │  ← subtitle
+// │                             │
+// │   [ New Game ]              │  ← always visible
+// │   [ Continue ]              │  ← hidden when no save exists
+// │                             │
+// │                             │
+// └─────────────────────────────┘
+//
+// GOAL: Entry point. Let the player start a fresh game or resume a saved one.
+// "Continue" appears only when PlayerPrefs holds a valid save.
+
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
