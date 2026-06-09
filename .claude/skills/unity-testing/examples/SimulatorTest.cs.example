@@ -1,0 +1,33 @@
+// Pure NUnit — no [UnityTest], no IEnumerator, no MonoBehaviour.
+// Seeded RNG ensures determinism.
+namespace Legends.Tests.EditMode
+{
+    [TestFixture]
+    public sealed class DragonEggRelaySimulatorTests
+    {
+        [Test]
+        public void Simulate_ProducesOneResultPerAthlete()
+        {
+            var config = EventConfigFactory.CreateDefault();
+            var team   = TeamBuilder.WithAthletes(4);
+            var rng    = new System.Random(42);
+
+            var result = new DragonEggRelaySimulator(rng).Simulate(config, team);
+
+            Assert.AreEqual(4, result.AthleteResults.Count);
+        }
+
+        [Test]
+        public void Simulate_ResultsAreSortedByRank()
+        {
+            var config = EventConfigFactory.CreateDefault();
+            var team   = TeamBuilder.WithAthletes(4);
+            var rng    = new System.Random(99);
+
+            var result = new DragonEggRelaySimulator(rng).Simulate(config, team);
+            var times  = result.AthleteResults.Select(r => r.TotalTime).ToList();
+
+            CollectionAssert.IsOrdered(times);
+        }
+    }
+}

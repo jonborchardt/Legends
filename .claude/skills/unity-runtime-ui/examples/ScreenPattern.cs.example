@@ -1,0 +1,22 @@
+// Minimal UIScreen subclass. Build() runs once; Show/Hide use SetActive.
+namespace Legends.UI
+{
+    public sealed class StatsPanel : UIScreen
+    {
+        private TextMeshProUGUI _scoreText;
+
+        protected override GameObject Build()
+        {
+            var root = UIFactory.CreatePanel("StatsPanel", null);
+            _scoreText = UIFactory.CreateText("Score: 0", root.transform, UIStyle.FontSizes.Body);
+            return root;
+        }
+
+        public override void Show()
+        {
+            base.Show();
+            // Populate fresh data every time the panel is shown.
+            _scoreText.text = $"Score: {GameSession.LatestResult?.TotalScore ?? 0}";
+        }
+    }
+}

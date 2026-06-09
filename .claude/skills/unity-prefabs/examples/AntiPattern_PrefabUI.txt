@@ -1,0 +1,28 @@
+ANTI-PATTERN: Prefab for a UI element
+======================================
+
+Problem
+-------
+Creating Assets/Prefabs/AthleteCard.prefab and instantiating it to populate a list:
+
+    var card = Instantiate(athleteCardPrefab, listParent);
+    card.GetComponent<AthleteCardView>().Populate(data);
+
+Why this is wrong in a PSC project
+-----------------------------------
+1. The prefab is a second source of truth for the card's layout — the factory class
+   is the first. They can drift.
+2. Prefab changes require the Unity editor; factory changes are just code.
+3. `GetComponent<AthleteCardView>()` after Instantiate is fragile — the component
+   must be on the exact same root, or the call silently returns null.
+4. `.prefab` assets trigger Unity's serialisation pipeline on every change,
+   adding noise to version control diffs.
+
+Correct approach
+----------------
+Use a static factory method:
+
+    AthleteCardFactory.Create(data, listParent);
+
+The factory builds the entire hierarchy in C#. All layout lives in one place.
+No prefab asset. No GetComponent search after instantiation.

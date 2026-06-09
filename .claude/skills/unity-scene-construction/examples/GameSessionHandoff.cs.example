@@ -1,0 +1,12 @@
+// Sender side (e.g., TeamHubScreen) — set before navigating.
+GameSession.LatestResult = simulator.Run(config, team);
+SceneFlow.GoToReplay();
+
+// Receiver side (ReplaySceneController.Start) — read on Start.
+private void Start()
+{
+    var result = GameSession.LatestResult;
+    if (result == null) { SceneFlow.GoToBoot(); return; }
+    _director = new ReplayDirector(result);
+    _director.Begin();
+}

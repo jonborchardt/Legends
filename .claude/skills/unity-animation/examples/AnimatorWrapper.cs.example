@@ -1,0 +1,14 @@
+// Typed wrapper — all callers go through here; no raw Animator calls outside.
+namespace Legends.Replay
+{
+    public sealed class AthleteAnimator
+    {
+        private readonly Animator _animator;
+
+        public AthleteAnimator(Animator animator) => _animator = animator;
+
+        public void SetRunning(bool value)  => _animator.SetBool(AnimParam.IsRunning, value);
+        public void TriggerPass()           => _animator.SetTrigger(AnimParam.Pass);
+        public void TriggerCelebrate()      => _animator.SetTrigger(AnimParam.Celebrate);
+    }
+}

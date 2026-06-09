@@ -1,0 +1,25 @@
+// Schema migration: handle old save formats before deserializing.
+// Called inside PlayerPrefsSaveService.Load() when version mismatch is detected.
+private GameState MigrateAndDeserialize(string json)
+{
+    var raw     = JObject.Parse(json);
+    int version = raw.Value<int?>("Version") ?? 0;
+
+    if (version < 2)
+    {
+        // v1 → v2: renamed "AthleteSpeed" to "BaseSpeed"
+        foreach (var athlete in raw["Athletes"] ?? Enumerable.Empty<JToken>())
+        {
+            if (athlete["AthleteSpeed"] != null)
+            {
+                athlete["BaseSpeed"] = athlete["AthleteSpeed"];
+                athlete.Value<JObject>()?.Remove("AthleteSpeed");
+            }
+        }
+        raw["Version"] = 2;
+    }
+
+    // Additional migrations would follow here.
+
+    return raw.ToObject<GameState>();
+}

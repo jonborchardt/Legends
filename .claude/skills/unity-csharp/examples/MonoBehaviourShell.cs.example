@@ -1,0 +1,21 @@
+// MonoBehaviour shell — thin; all real logic lives in a plain C# domain class.
+// The MB is justified only because Start/OnDestroy lifecycle is needed here.
+namespace Legends.Replay
+{
+    public sealed class ReplaySceneController : MonoBehaviour
+    {
+        private ReplayDirector _director;
+
+        private void Start()
+        {
+            // Dependency resolved in code, not via [SerializeField].
+            _director = new ReplayDirector(GameSession.LatestResult);
+            _director.Begin();
+        }
+
+        private void OnDestroy()
+        {
+            _director?.Dispose();
+        }
+    }
+}

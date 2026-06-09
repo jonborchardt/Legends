@@ -1,0 +1,19 @@
+// Dynamic list inside a scroll view — cleared and repopulated on each Show().
+protected override GameObject Build()
+{
+    var root   = UIFactory.CreatePanel("TeamHubScreen", null);
+    var scroll = UIFactory.CreateScrollView(root.transform);
+    _listParent = scroll.content.transform;   // cache for Show()
+    return root;
+}
+
+public override void Show()
+{
+    base.Show();
+    // Clear previous cards.
+    foreach (Transform child in _listParent)
+        Object.Destroy(child.gameObject);
+
+    foreach (var athlete in GameSession.CurrentTeam.Athletes)
+        AthleteCardFactory.Create(athlete, _listParent);
+}

@@ -1,0 +1,26 @@
+WebGL Build Checklist
+======================
+
+Before building:
+[ ] Player Settings → WebGL → Compression Format: Brotli or Gzip
+[ ] Player Settings → WebGL → Exception Support: None (release) or Explicitly Thrown Only
+[ ] Player Settings → Other → Code Stripping Level: Medium or High
+[ ] Player Settings → Other → Strip Engine Code: enabled
+[ ] Development Build: OFF for release
+[ ] Texture compression: DXT1/DXT5 for desktop, ETC2 for mobile WebGL
+[ ] Run Tools > Legends > Build All (regenerates AnimatorController, EventConfig)
+[ ] No Debug.Log calls left in hot paths (crosses JS boundary)
+[ ] Addressables groups built and catalog up to date
+
+After building:
+[ ] Open Build/WebGL/WebGL/index.html in a local HTTP server (not file://)
+    python -m http.server 8080 --directory Build/WebGL
+[ ] Test main flow end to end
+[ ] Check browser console for errors or missing asset 404s
+[ ] Check memory usage in DevTools — look for texture spikes
+
+GitHub Pages deploy:
+[ ] Ensure Build/ output folder committed or CI uploads it
+[ ] GitHub Pages source: gh-pages branch or /docs folder
+[ ] If using Brotli: server must send Content-Encoding: br header
+    (GitHub Pages supports Brotli natively as of 2023)

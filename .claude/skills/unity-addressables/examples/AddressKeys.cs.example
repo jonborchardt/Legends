@@ -1,0 +1,15 @@
+// Typed address constants — one file per logical group.
+// Never scatter address strings across multiple files.
+namespace Legends.Data.Assets
+{
+    public static class AddressKeys
+    {
+        // Athletes group (label: "athlete")
+        public const string AthleteCharacter  = "athlete_character";
+        public const string AthleteController = "athlete_controller";
+
+        // VFX group (label: "fx")
+        public const string FinishLineBurst   = "fx_finish_burst";
+        public const string EggDropSplash     = "fx_egg_drop_splash";
+    }
+}

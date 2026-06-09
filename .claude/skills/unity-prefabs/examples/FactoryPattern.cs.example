@@ -1,0 +1,19 @@
+// Static factory — no state, returns a fully built GameObject.
+// Use this instead of a prefab for UI/logic objects.
+namespace Legends.UI
+{
+    public static class ResultRowFactory
+    {
+        public static GameObject Create(AthleteResult result, Transform parent)
+        {
+            var root  = UIFactory.CreateHorizontalGroup(parent);
+            root.name = $"ResultRow_{result.AthleteId}";
+
+            UIFactory.CreateText(result.AthleteName,               root.transform, UIStyle.FontSizes.Body);
+            UIFactory.CreateText($"{result.TimeSeconds:F2}s",      root.transform, UIStyle.FontSizes.Body);
+            UIFactory.CreateText(result.Rank.ToString(),           root.transform, UIStyle.FontSizes.Body);
+
+            return root;
+        }
+    }
+}

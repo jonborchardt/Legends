@@ -1,0 +1,11 @@
+// Single source of truth for animator parameter names.
+// Generator and AthleteAnimator both reference these constants.
+namespace Legends.Replay
+{
+    public static class AnimParam
+    {
+        public const string IsRunning = "IsRunning";
+        public const string Pass      = "Pass";
+        public const string Celebrate = "Celebrate";
+    }
+}

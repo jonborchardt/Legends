@@ -1,0 +1,37 @@
+EditMode test assembly (pure C#, no Unity lifecycle):
+
+  Legends.Tests.EditMode.asmdef
+  {
+    "name": "Legends.Tests.EditMode",
+    "references": [
+      "Legends.Data",
+      "Legends.Simulation",
+      "Legends.Services"
+    ],
+    "includePlatforms": ["Editor"],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": ["nunit.framework.dll"],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false,
+    "optionalUnityReferences": ["TestAssemblies"]
+  }
+
+PlayMode test assembly (requires Unity lifecycle — use sparingly):
+
+  Legends.Tests.PlayMode.asmdef
+  {
+    "name": "Legends.Tests.PlayMode",
+    "references": ["Legends.Data", "Legends.Replay"],
+    "includePlatforms": [],        ← empty = all platforms
+    "optionalUnityReferences": ["TestAssemblies"]
+  }
+
+Rules:
+- EditMode tests run without entering Play Mode — fast.
+- PlayMode tests spin up the Unity runtime — slow; use only when Awake/Start/coroutine is the subject.
+- Never reference Legends.UI from a test assembly — UI is not testable without PlayMode,
+  and layout is verified by code review, not automated tests.

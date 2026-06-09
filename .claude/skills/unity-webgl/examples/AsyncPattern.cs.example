@@ -1,0 +1,30 @@
+// Correct async patterns for WebGL — main thread only, no Task.Run, no blocking.
+
+// Option A: Coroutine (widest compatibility)
+private IEnumerator LoadCharacter()
+{
+    var handle = Addressables.LoadAssetAsync<GameObject>(AddressKeys.AthleteCharacter);
+    yield return handle;   // resumes on main thread after load completes
+
+    if (handle.Status != AsyncOperationStatus.Succeeded)
+    {
+        Debug.LogError("Character load failed");
+        yield break;
+    }
+    SpawnCharacter(handle.Result);
+}
+
+// Option B: async void (Unity 2021+, still main thread)
+private async void LoadCharacterAsync()
+{
+    var handle = Addressables.LoadAssetAsync<GameObject>(AddressKeys.AthleteCharacter);
+    await handle.Task;   // awaits on main thread — OK on WebGL
+
+    if (handle.Status != AsyncOperationStatus.Succeeded) return;
+    SpawnCharacter(handle.Result);
+}
+
+// FORBIDDEN on WebGL:
+// handle.WaitForCompletion()  → blocks JS event loop, tab freezes
+// Task.Run(() => Simulate())  → runs synchronously, blocks frame
+// new Thread(...)             → silently no-ops or crashes

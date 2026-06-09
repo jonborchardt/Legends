@@ -1,0 +1,18 @@
+Assembly dependency graph (one-way, no cycles):
+
+  Legends.Data          — pure C# POCOs; no Unity Engine dependency beyond primitives
+        ↓
+  Legends.Services      — SceneFlow, ScreenRegistry, ISaveService interfaces
+  Legends.Simulation    — DragonEggRelaySimulator, EventConfigFactory
+        ↓
+  Legends.Replay        — AthleteFactory, ReplayDirector, camera controllers
+  Legends.UI            — UIFactory, UIScreen subclasses, AthleteCardFactory
+
+Test assemblies:
+  Legends.Tests.EditMode   — pure NUnit; references Data + Simulation + Services
+  Legends.Tests.PlayMode   — IEnumerator tests; only when Unity lifecycle is the subject
+
+Rules:
+- Replay and UI must NOT depend on each other.
+- Tests must NOT reference Unity assets at runtime (no Resources.Load).
+- Editor-only code goes in an Assembly with "Editor" in the name and Editor platform restriction.

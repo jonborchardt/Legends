@@ -1,0 +1,31 @@
+// Correct Addressables load + release pattern.
+// Cache the handle — not just the result — so you can release it cleanly.
+namespace Legends.Replay
+{
+    public sealed class AthleteSpawner : MonoBehaviour
+    {
+        private AsyncOperationHandle<GameObject> _characterHandle;
+        private GameObject _instance;
+
+        public IEnumerator Spawn(Transform parent)
+        {
+            _characterHandle = Addressables.LoadAssetAsync<GameObject>(AddressKeys.AthleteCharacter);
+            yield return _characterHandle;
+
+            if (_characterHandle.Status != AsyncOperationStatus.Succeeded)
+            {
+                Debug.LogError($"Failed to load {AddressKeys.AthleteCharacter}");
+                FallbackToCapsule(parent);
+                yield break;
+            }
+
+            _instance = Object.Instantiate(_characterHandle.Result, parent);
+        }
+
+        private void OnDestroy()
+        {
+            if (_characterHandle.IsValid())
+                Addressables.Release(_characterHandle);
+        }
+    }
+}

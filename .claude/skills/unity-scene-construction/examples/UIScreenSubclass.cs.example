@@ -1,0 +1,27 @@
+// Template for a new screen. Build() runs once; Show/Hide toggle SetActive.
+namespace Legends.UI
+{
+    public sealed class EventSelectScreen : UIScreen
+    {
+        private Button _startButton;
+
+        protected override GameObject Build()
+        {
+            var root = UIFactory.CreatePanel("EventSelectScreen", null);
+            _startButton = UIFactory.CreateButton("Start Event", root.transform, OnStartClicked);
+            return root;
+        }
+
+        public override void Show()
+        {
+            base.Show();
+            // Populate data on show, not in Build.
+        }
+
+        private void OnStartClicked()
+        {
+            GameSession.LatestConfig = EventConfigFactory.Create();
+            SceneFlow.GoToReplay();
+        }
+    }
+}

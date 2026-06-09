@@ -1,0 +1,11 @@
+// Abstraction — game logic never touches PlayerPrefs directly.
+namespace Legends.Services
+{
+    public interface ISaveService
+    {
+        bool      Exists();
+        void      Save(GameState state);
+        GameState Load();    // returns null if no save exists
+        void      Delete();
+    }
+}

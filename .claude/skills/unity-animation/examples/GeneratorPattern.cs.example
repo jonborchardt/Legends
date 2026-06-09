@@ -1,0 +1,43 @@
+// Editor-only generator for the Athlete AnimatorController.
+// Run via Tools > Legends > Build All (or directly via MenuItem).
+#if UNITY_EDITOR
+using UnityEditor.Animations;
+
+namespace Legends.Editor
+{
+    public static class AthleteControllerGenerator
+    {
+        private const string OutputPath = "Assets/Resources/Animators/Athlete.controller";
+
+        [MenuItem("Tools/Legends/Generate Athlete Controller")]
+        public static void Generate()
+        {
+            var controller = AnimatorController.CreateAnimatorControllerAtPath(OutputPath);
+            var root = controller.layers[0].stateMachine;
+
+            var idle     = root.AddState("Idle");
+            var run      = root.AddState("Run");
+            var pass     = root.AddState("Pass");
+            root.defaultState = idle;
+
+            // Idle → Run
+            var toRun = idle.AddTransition(run);
+            toRun.AddCondition(AnimatorConditionMode.If, 0, AnimParam.IsRunning);
+            toRun.hasExitTime = false;
+
+            // Run → Idle
+            var toIdle = run.AddTransition(idle);
+            toIdle.AddCondition(AnimatorConditionMode.IfNot, 0, AnimParam.IsRunning);
+            toIdle.hasExitTime = false;
+
+            // Run → Pass (trigger)
+            var toPass = run.AddTransition(pass);
+            toPass.AddCondition(AnimatorConditionMode.If, 0, AnimParam.Pass);
+            toPass.hasExitTime = false;
+
+            AssetDatabase.SaveAssets();
+            Debug.Log("Athlete controller regenerated.");
+        }
+    }
+}
+#endif

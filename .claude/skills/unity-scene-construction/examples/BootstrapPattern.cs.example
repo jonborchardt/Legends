@@ -1,0 +1,12 @@
+// Single MonoBehaviour in Boot.unity — everything else is spawned from code.
+namespace Legends.Bootstrap
+{
+    public sealed class BootController : MonoBehaviour
+    {
+        private void Start()
+        {
+            ScreenRegistry.Instance.RegisterAll();
+            ScreenRegistry.Instance.ShowScreen<MainMenuScreen>();
+        }
+    }
+}

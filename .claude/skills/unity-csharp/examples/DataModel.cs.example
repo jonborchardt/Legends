@@ -1,0 +1,20 @@
+// Plain C# data model — no MonoBehaviour, no SerializeField, no Unity dependencies.
+// Immutable construction via constructor; properties are read-only externally.
+namespace Legends.Data
+{
+    public sealed class SegmentResult
+    {
+        public int AthleteId       { get; }
+        public int SegmentIndex    { get; }
+        public float TimeSeconds   { get; }
+        public bool DroppedEgg     { get; }
+
+        public SegmentResult(int athleteId, int segmentIndex, float timeSeconds, bool droppedEgg = false)
+        {
+            AthleteId     = athleteId;
+            SegmentIndex  = segmentIndex;
+            TimeSeconds   = timeSeconds;
+            DroppedEgg    = droppedEgg;
+        }
+    }
+}
