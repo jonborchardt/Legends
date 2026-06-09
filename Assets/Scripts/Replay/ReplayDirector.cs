@@ -20,7 +20,6 @@ namespace Legends.Replay
         // Athlete roster — populated by Load(); used to look up names for factory
         List<AthleteState> _athletes = new();
 
-        int   _frameIndex;
         int   _eventIndex;
         float _playhead;
         bool  _playing;
@@ -40,7 +39,6 @@ namespace Legends.Replay
             _result        = result;
             _athletes      = athletes ?? new List<AthleteState>();
             _playhead      = 0f;
-            _frameIndex    = 0;
             _eventIndex    = 0;
             _playing       = false;
             _completeFired = false;

@@ -10,10 +10,12 @@ namespace Legends.Replay
     {
         static GameObject _cachedMeshPrefab;
         static RuntimeAnimatorController _cachedController;
+        static Material _cachedMaterial;
 
 #if !UNITY_EDITOR
         static AsyncOperationHandle<GameObject> _meshHandle;
         static AsyncOperationHandle<RuntimeAnimatorController> _controllerHandle;
+        static AsyncOperationHandle<Material> _materialHandle;
 #endif
 
         // Preload both assets before calling Spawn. Call from ReplaySceneController via
@@ -27,6 +29,7 @@ namespace Legends.Replay
 #if UNITY_EDITOR
             _cachedMeshPrefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>(config.MeshEditorPath);
             _cachedController = UnityEditor.AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>(config.ControllerEditorPath);
+            _cachedMaterial   = UnityEditor.AssetDatabase.LoadAssetAtPath<Material>(config.MatEditorPath);
             yield break;
 #else
             _meshHandle = Addressables.LoadAssetAsync<GameObject>(AddressKeys.AthleteCharacter);
@@ -42,6 +45,13 @@ namespace Legends.Replay
                 _cachedController = _controllerHandle.Result;
             else
                 Debug.LogWarning($"[AthleteFactory] Failed to load controller '{AddressKeys.AthleteController}' — athletes will have no animations.");
+
+            _materialHandle = Addressables.LoadAssetAsync<Material>(AddressKeys.AthleteMaterial);
+            yield return _materialHandle;
+            if (_materialHandle.Status == AsyncOperationStatus.Succeeded)
+                _cachedMaterial = _materialHandle.Result;
+            else
+                Debug.LogWarning($"[AthleteFactory] Failed to load material '{AddressKeys.AthleteMaterial}' — flat colour fallback will be used.");
 #endif
         }
 
@@ -52,9 +62,11 @@ namespace Legends.Replay
 #if !UNITY_EDITOR
             if (_meshHandle.IsValid())       Addressables.Release(_meshHandle);
             if (_controllerHandle.IsValid()) Addressables.Release(_controllerHandle);
+            if (_materialHandle.IsValid())   Addressables.Release(_materialHandle);
 #endif
             _cachedMeshPrefab = null;
             _cachedController = null;
+            _cachedMaterial   = null;
         }
 
         public static GameObject Spawn(AthleteState athlete, int laneIndex,
@@ -114,10 +126,7 @@ namespace Legends.Replay
 
         static void ApplyMaterial(GameObject meshGo, int laneIndex, AthleteVisualConfig config)
         {
-            Material baseMat = null;
-#if UNITY_EDITOR
-            baseMat = UnityEditor.AssetDatabase.LoadAssetAtPath<Material>(config.MatEditorPath);
-#endif
+            Material baseMat = _cachedMaterial;
             if (baseMat == null)
             {
                 var shader = Shader.Find("Universal Render Pipeline/Lit") ?? Shader.Find("Standard");

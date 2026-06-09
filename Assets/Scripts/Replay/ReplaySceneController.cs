@@ -28,7 +28,7 @@ namespace Legends.Replay
             _director = GetComponent<ReplayDirector>()
                      ?? gameObject.AddComponent<ReplayDirector>();
 
-            var cam = FindObjectOfType<ReplayCameraController>();
+            var cam = FindAnyObjectByType<ReplayCameraController>();
             if (cam != null) cam.Init(_director);
 
             _director.OnReplayComplete += OnReplayComplete;

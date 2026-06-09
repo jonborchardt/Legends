@@ -17,7 +17,12 @@ namespace Legends.Editor
         static LegendsBuildTools() => BuildAll();
 
         // Runs before every WebGL / standalone build
-        public void OnPreprocessBuild(BuildReport _) => BuildAll();
+        public void OnPreprocessBuild(BuildReport _)
+        {
+            BuildAll();
+            AddressablesSetup.Register();
+            AddressablesSetup.BuildContent();
+        }
 
         [MenuItem("Tools/Legends/Build All")]
         public static void BuildAll()

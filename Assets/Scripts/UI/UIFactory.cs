@@ -263,7 +263,7 @@ namespace Legends.UI
 
         static void EnsureEventSystem()
         {
-            if (Object.FindObjectOfType<UnityEngine.EventSystems.EventSystem>() != null)
+            if (Object.FindAnyObjectByType<UnityEngine.EventSystems.EventSystem>() != null)
                 return;
 
             var es = new GameObject("EventSystem");
