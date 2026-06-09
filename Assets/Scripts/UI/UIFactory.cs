@@ -206,9 +206,10 @@ namespace Legends.UI
             bgImg.color = UIStyle.StatBarBackground;
             FillParent(bg.GetComponent<RectTransform>());
 
-            // Fill area
+            // Fill area — needs an Image to get a RectTransform at runtime
             var fillArea = new GameObject("Fill Area");
             fillArea.transform.SetParent(go.transform, false);
+            fillArea.AddComponent<Image>().color = Color.clear;
             var fillAreaRt = fillArea.GetComponent<RectTransform>();
             fillAreaRt.anchorMin = new Vector2(0, 0.25f);
             fillAreaRt.anchorMax = new Vector2(1, 0.75f);

@@ -37,7 +37,7 @@ namespace Legends.UI
         void RefreshContinue()
         {
             if (_continueButton == null) return;
-            _continueButton.interactable = new PlayerPrefsSaveService().Exists();
+            _continueButton.gameObject.SetActive(new PlayerPrefsSaveService().Exists());
         }
 
         void OnNewGame()

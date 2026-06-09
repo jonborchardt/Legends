@@ -1,5 +1,4 @@
 using UnityEngine;
-using TMPro;
 using Legends.Data;
 using Legends.Services;
 using Legends.Simulation;
@@ -8,6 +7,9 @@ namespace Legends.UI
 {
     public class TeamHubScreen : UIScreen
     {
+        const float HeaderH = 80f;
+        const float FooterH = 80f;
+
         protected override GameObject Build()
         {
             var saveService = new PlayerPrefsSaveService();
@@ -22,17 +24,33 @@ namespace Legends.UI
             var root   = UIFactory.CreatePanel(canvas.transform, "Root", UIStyle.Background);
             UIFactory.FillParent(root.GetComponent<RectTransform>());
 
-            UIFactory.CreateText(root.transform, "Title", gameState.Team.TeamName, UIStyle.FontTitle);
+            // Title — pinned to top
+            var title   = UIFactory.CreateText(root.transform, "Title", gameState.Team.TeamName, UIStyle.FontTitle);
+            var titleRt = title.GetComponent<RectTransform>();
+            titleRt.anchorMin = new Vector2(0, 1);
+            titleRt.anchorMax = new Vector2(1, 1);
+            titleRt.offsetMin = new Vector2(16, -HeaderH);
+            titleRt.offsetMax = new Vector2(-16, 0);
 
+            // Scroll — fills space between header and footer
             Transform scrollContent;
-            var scroll = UIFactory.CreateScrollView(root.transform, "Scroll", out scrollContent);
+            var scroll   = UIFactory.CreateScrollView(root.transform, "Scroll", out scrollContent);
             var scrollRt = scroll.GetComponent<RectTransform>();
-            UIFactory.FillParent(scrollRt);
+            scrollRt.anchorMin = Vector2.zero;
+            scrollRt.anchorMax = Vector2.one;
+            scrollRt.offsetMin = new Vector2(0, FooterH);
+            scrollRt.offsetMax = new Vector2(0, -HeaderH);
 
             foreach (var athlete in gameState.Team.Roster)
                 AthleteCardFactory.Create(scrollContent, athlete);
 
-            UIFactory.CreateButton(root.transform, "RunEvent", "Run Event", () => OnRunEvent(saveService, gameState));
+            // Run Event button — pinned to bottom
+            var btn   = UIFactory.CreateButton(root.transform, "RunEvent", "Run Event", () => OnRunEvent(saveService, gameState));
+            var btnRt = btn.GetComponent<RectTransform>();
+            btnRt.anchorMin = new Vector2(0, 0);
+            btnRt.anchorMax = new Vector2(1, 0);
+            btnRt.offsetMin = new Vector2(16, 8);
+            btnRt.offsetMax = new Vector2(-16, FooterH - 8);
 
             return canvas;
         }
