@@ -14,11 +14,11 @@ namespace Legends.Services
 
         public static void GoToMainMenu()    => GoToMainMenuHandler?.Invoke();
         public static void GoToTeamHub()     => GoToTeamHubHandler?.Invoke();
-        public static void GoToEventReplay() => SceneManager.LoadScene("EventReplay");
+        public static void GoToEventReplay() => SceneManager.LoadScene("Replay3D");
 
         public static void GoToResults()
         {
-            SceneManager.UnloadSceneAsync("EventReplay");
+            SceneManager.UnloadSceneAsync("Replay3D");
             GoToResultsHandler?.Invoke();
         }
     }
