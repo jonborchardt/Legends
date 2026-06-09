@@ -4,6 +4,15 @@ Olympic Manager MVP — a WebGL game on GitHub Pages. Player manages a fantasy a
 
 No backend. No multiplayer. No cloud saves. All state in browser localStorage.
 
+## Status
+
+MVP code is complete. The full loop — team view → simulate Dragon Egg Relay → 3D replay → results → persist to localStorage — is implemented and working in Play mode.
+
+**Three manual steps before the game is live:**
+- [ ] Open Unity → switch Build Target to WebGL → confirm build succeeds
+- [ ] GitHub Pages: repo Settings → Pages → Source: Deploy from branch → `gh-pages` / `/ (root)` → Save
+- [ ] Smoke test the deployed URL after the first CI run completes
+
 ## Development
 
 The project uses **Programmatic Scene Construction (PSC)**: all UI and 3D objects are built entirely in C#. The Unity Editor is used only to run Play mode and build WebGL — never to place objects or wire up inspectors.

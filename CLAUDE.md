@@ -6,6 +6,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Olympic Manager MVP — a WebGL game on GitHub Pages. Player manages a fantasy athletic team and watches a 3D replay of a simulated Dragon Egg Relay event. Unity project targeting WebGL, no backend.
 
+## Status
+
+MVP code complete. Full player loop is implemented and working in Play mode:
+Main Menu → Team Hub (view roster) → simulate Dragon Egg Relay → Replay3D (3D replay) → Results → persist to localStorage.
+
+**Pending before live deployment (manual steps):**
+- Open Unity → switch Build Target to WebGL → confirm build succeeds
+- GitHub Pages: repo Settings → Pages → source: `gh-pages` branch / root
+- Smoke test the deployed URL after first CI run
+
 ## Architecture: Programmatic Scene Construction (PSC)
 
 The project uses **Code-First Authoring** (Programmatic Scene Construction). C# code is the sole authoritative source for all scene structure, UI layout, and runtime objects. The Unity Editor is a build host only — not an authoring tool.
@@ -42,6 +52,14 @@ PSC rules:
 | Scene navigation routes | [Assets/Scripts/Services/SceneFlow.cs](Assets/Scripts/Services/SceneFlow.cs) |
 | Replay camera behaviour | [Assets/Scripts/Replay/ReplayCameraController.cs](Assets/Scripts/Replay/ReplayCameraController.cs) |
 
+## Non-Obvious Implementation Notes
+
+**SceneFlow delegate pattern** — `SceneFlow` (Legends.Services) exposes `static Action` fields (`GoToMainMenuHandler`, etc.) that `ScreenRegistry` (Legends.UI) registers at startup via `[RuntimeInitializeOnLoadMethod]`. This indirection exists because Services cannot reference UI types without creating a circular assembly dependency.
+
+**EventConfigFactory lives in Legends.Simulation** — not Legends.Services, because `EventConfig`/`EventConfigData` are defined in that assembly and keeping it there avoids a cross-assembly reference.
+
+**Addressables for athlete assets** — `AthleteFactory` loads the character mesh and `AnimatorController` via Addressables (address keys in `AddressKeys.cs`). In-editor it falls back to `AssetDatabase` paths for fast iteration; the async path is only active in builds. `Addressables.WaitForCompletion()` is forbidden on WebGL — `ReplaySceneController` awaits the load before calling `Spawn`.
+
 ## Scenes
 
 Only two scenes exist in the build:
@@ -49,7 +67,7 @@ Only two scenes exist in the build:
 | Scene | Purpose |
 |---|---|
 | `Boot.unity` | Entry point. ScreenRegistry auto-bootstraps; BootController triggers main menu. |
-| `EventReplay.unity` | 3D replay. ReplaySceneController wires up ReplayDirector and camera in code. |
+| `Replay3D.unity` | 3D replay. ReplaySceneController wires up ReplayDirector and camera in code. |
 
 All UI screens (MainMenu, TeamHub, Results) are canvas GameObjects built in code by ScreenRegistry — no separate scene files.
 
@@ -72,9 +90,25 @@ These rules are absolute. Never violate them:
 
 ## Deferred — Do Not Build
 
-Training, recruitment, seasons, equipment, economy, multiple events, physics-based egg handling, character creation, online services, analytics, multiplayer, Addressables, ECS, DI frameworks.
+Training, recruitment, seasons, equipment, economy, multiple events, physics-based egg handling, character creation, online services, analytics, multiplayer, ECS, DI frameworks.
 
 If any proposed implementation requires these: reject it.
+
+## Skills
+
+Project-local skills in `.claude/skills/` — loaded automatically by the harness:
+
+| Skill | When it applies |
+|---|---|
+| `unity-csharp` | Any C# file creation or edit; foundation for all other skills |
+| `unity-scene-construction` | Adding screens, scenes, or major features; architectural decisions |
+| `unity-runtime-ui` | Any UI screen, panel, button, or layout change |
+| `unity-prefabs` | Factory classes, `Instantiate`, spawning repeated objects |
+| `unity-animation` | Animator states, transitions, `AthleteAnimator`, controller generator |
+| `unity-addressables` | Runtime asset loading; any `Resources.Load` question |
+| `unity-local-storage` | Save/load, `ISaveService`, `GameState`, schema migration |
+| `unity-webgl` | Threading, async, file I/O, build settings, GitHub Pages deploy |
+| `unity-testing` | Writing or reviewing any test; simulation or data-transform logic |
 
 ## Assets
 
