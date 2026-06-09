@@ -6,6 +6,34 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Olympic Manager MVP — a WebGL game on GitHub Pages. Player manages a fantasy athletic team and watches a 3D replay of a simulated Dragon Egg Relay event. Unity project targeting WebGL, no backend.
 
+## Active Refactor: Programmatic Scene Construction (PSC)
+
+The project is undergoing a **Code-First Authoring** refactor (also called Programmatic Scene
+Construction). The goal: C# code is the sole authoritative source for all scene structure, UI
+layout, and runtime objects. The Unity Editor is a build host only — not an authoring tool.
+
+**End state: when the refactor is complete, the Unity Editor is never required for development.**
+All future work is written as C# and takes effect on the next Play/build. No inspector, no scene
+hierarchy, no prefab editing mode — ever.
+
+**The "never edit in editor" rule** — for any UI, prefab, or scene content change:
+1. Edit the relevant `*Screen.cs`, `*Factory.cs`, or generator script
+2. Hit Play — the change is live immediately
+3. AnimatorController only: run `Tools > Legends > Regenerate Athlete Controller`
+
+Refactor plan: [Plans/refactor/MASTER.md](Plans/refactor/MASTER.md)
+
+PSC rules (in addition to the non-negotiables below):
+
+| Rule | Constraint |
+|---|---|
+| No editor-authored UI | All canvas/UI hierarchy built by `UIFactory` + `UIScreen.Build()` |
+| No .prefab files (runtime objects) | AthleteCard, ResultRow, Athlete built by factory classes |
+| No `[SerializeField]` drag-and-drop | All references assigned in code |
+| No inspector-assigned materials | Materials created with `new Material(Shader.Find(...))` |
+| No hand-edited .asset files | EventConfig created by `EventConfigFactory`; AnimatorController by generator script |
+| No hand-placed GameObjects in scenes | Scenes contain only `SceneBootstrap`; everything else is spawned |
+
 ## Architectural Non-Negotiables
 
 These rules are absolute. Never violate them:

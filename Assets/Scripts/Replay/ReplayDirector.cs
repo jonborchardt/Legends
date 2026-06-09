@@ -10,14 +10,15 @@ namespace Legends.Replay
         public event Action OnReplayComplete;
         public event Action<ReplayEvent> OnReplayEventFired;
 
-        [SerializeField] GameObject athletePrefab;
-        [SerializeField] Material[] athleteMaterials;
-        [SerializeField] float replaySpeed = 1f;
+        public float ReplaySpeed = 1f;
 
         EventResult _result;
-        List<GameObject> _spawnedAthletes = new();
-        Dictionary<string, AthleteAnimator> _animators  = new();
-        Dictionary<string, Transform>       _transforms = new();
+        List<GameObject>          _spawnedAthletes = new();
+        Dictionary<string, AthleteAnimator> _animators   = new();
+        Dictionary<string, Transform>       _transforms  = new();
+
+        // Athlete roster — populated by Load(); used to look up names for factory
+        List<AthleteState> _athletes = new();
 
         int   _frameIndex;
         int   _eventIndex;
@@ -28,7 +29,7 @@ namespace Legends.Replay
         public float CurrentTime   => _playhead;
         public float TotalDuration { get; private set; }
 
-        public void Load(EventResult result)
+        public void Load(EventResult result, List<AthleteState> athletes)
         {
             foreach (var go in _spawnedAthletes)
                 Destroy(go);
@@ -37,6 +38,7 @@ namespace Legends.Replay
             _transforms.Clear();
 
             _result        = result;
+            _athletes      = athletes ?? new List<AthleteState>();
             _playhead      = 0f;
             _frameIndex    = 0;
             _eventIndex    = 0;
@@ -47,23 +49,26 @@ namespace Legends.Replay
                 ? result.Frames[result.Frames.Count - 1].Timestamp
                 : 0f;
 
+            // Build a lookup from id → AthleteState for fast access
+            var athleteById = new Dictionary<string, AthleteState>();
+            foreach (var a in _athletes)
+                athleteById[a.Id] = a;
+
             for (int i = 0; i < result.Placements.Count; i++)
             {
                 string athleteId = result.Placements[i];
+                athleteById.TryGetValue(athleteId, out var state);
 
-                var instance = Instantiate(athletePrefab);
-                instance.name = $"Athlete_{athleteId}";
-                instance.transform.position = new Vector3(0f, 0f, i * 1.2f);
-
-                if (athleteMaterials != null && athleteMaterials.Length > 0)
-                {
-                    var renderer = instance.GetComponentInChildren<MeshRenderer>();
-                    if (renderer != null)
-                        renderer.material = athleteMaterials[i % athleteMaterials.Length];
-                }
+                var instance = state != null
+                    ? AthleteFactory.Spawn(state, i)
+                    : FallbackAthlete(athleteId, i);
 
                 _spawnedAthletes.Add(instance);
-                _animators[athleteId]  = instance.GetComponent<AthleteAnimator>();
+
+                var animator = instance.GetComponent<AthleteAnimator>();
+                if (animator != null)
+                    _animators[athleteId] = animator;
+
                 _transforms[athleteId] = instance.transform;
             }
 
@@ -77,8 +82,8 @@ namespace Legends.Replay
         {
             if (_result == null || _result.Placements.Count == 0) return null;
 
-            Transform best = null;
-            float bestX = float.MinValue;
+            Transform best  = null;
+            float     bestX = float.MinValue;
             foreach (var kvp in _transforms)
             {
                 if (kvp.Value.position.x > bestX)
@@ -100,7 +105,7 @@ namespace Legends.Replay
         {
             if (!_playing || _result == null) return;
 
-            _playhead += Time.deltaTime * replaySpeed;
+            _playhead += Time.deltaTime * ReplaySpeed;
 
             ApplyFrames();
             FirePendingEvents();
@@ -108,7 +113,7 @@ namespace Legends.Replay
             if (_playhead >= TotalDuration && !_completeFired)
             {
                 _completeFired = true;
-                _playing = false;
+                _playing       = false;
                 OnReplayComplete?.Invoke();
             }
         }
@@ -180,6 +185,17 @@ namespace Legends.Replay
                     else              animator.PlayIdle();
                     break;
             }
+        }
+
+        static GameObject FallbackAthlete(string athleteId, int laneIndex)
+        {
+            var go = new GameObject($"Athlete_{athleteId}");
+            go.transform.position = new Vector3(0f, 0f, laneIndex * 1.2f);
+            var capsule = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+            capsule.transform.SetParent(go.transform, false);
+            capsule.transform.localPosition = new Vector3(0f, 1f, 0f);
+            go.AddComponent<AthleteAnimator>();
+            return go;
         }
     }
 }

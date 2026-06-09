@@ -5,12 +5,13 @@ namespace Legends.Replay
 {
     public class ReplayCameraController : MonoBehaviour
     {
-        [SerializeField] ReplayDirector director;
-        [SerializeField] float smoothTime            = 0.3f;
-        [SerializeField] Vector3 followOffset        = new Vector3(-8f, 4f, 0f);
-        [SerializeField] Vector3 focusOffset         = new Vector3(-4f, 3f, 2f);
-        [SerializeField] Vector3 wideShotPosition    = new Vector3(-15f, 8f, 0f);
-        [SerializeField] float focusDuration         = 1.5f;
+        ReplayDirector _director;
+
+        float   _smoothTime         = 0.3f;
+        Vector3 _followOffset       = new Vector3(-8f, 4f, 0f);
+        Vector3 _focusOffset        = new Vector3(-4f, 3f, 2f);
+        Vector3 _wideShotPosition   = new Vector3(-15f, 8f, 0f);
+        float   _focusDuration      = 1.5f;
 
         enum CameraMode { FollowLeader, FocusAthlete, WideShot }
 
@@ -20,27 +21,32 @@ namespace Legends.Replay
         float      _focusTimer;
         bool       _wideShotTriggered;
 
-        void OnEnable()
+        // Called by ReplayBootstrap after director is created.
+        public void Init(ReplayDirector director)
         {
-            if (director != null)
-                director.OnReplayEventFired += HandleEvent;
+            if (_director != null)
+                _director.OnReplayEventFired -= HandleEvent;
+
+            _director = director;
+            if (_director != null)
+                _director.OnReplayEventFired += HandleEvent;
         }
 
         void OnDisable()
         {
-            if (director != null)
-                director.OnReplayEventFired -= HandleEvent;
+            if (_director != null)
+                _director.OnReplayEventFired -= HandleEvent;
         }
 
         void HandleEvent(ReplayEvent evt)
         {
             if (evt.EventType == EventTypes.EggDrop)
             {
-                var target = director.GetTransformForAthlete(evt.AthleteId);
+                var target = _director.GetTransformForAthlete(evt.AthleteId);
                 if (target != null)
                 {
                     _focusTarget = target;
-                    _focusTimer  = focusDuration;
+                    _focusTimer  = _focusDuration;
                     _mode = CameraMode.FocusAthlete;
                 }
             }
@@ -54,6 +60,8 @@ namespace Legends.Replay
 
         void Update()
         {
+            if (_director == null) return;
+
             switch (_mode)
             {
                 case CameraMode.FollowLeader: UpdateFollowLeader(); break;
@@ -64,12 +72,12 @@ namespace Legends.Replay
 
         void UpdateFollowLeader()
         {
-            var leaderTransform = director.GetLeaderTransform();
+            var leaderTransform = _director.GetLeaderTransform();
             if (leaderTransform == null) return;
 
-            Vector3 targetPos = leaderTransform.position + followOffset;
+            Vector3 targetPos = leaderTransform.position + _followOffset;
             transform.position = Vector3.SmoothDamp(
-                transform.position, targetPos, ref _velocity, smoothTime);
+                transform.position, targetPos, ref _velocity, _smoothTime);
             transform.LookAt(leaderTransform.position);
         }
 
@@ -77,9 +85,9 @@ namespace Legends.Replay
         {
             if (_focusTarget == null) { _mode = CameraMode.FollowLeader; return; }
 
-            Vector3 targetPos = _focusTarget.position + focusOffset;
+            Vector3 targetPos = _focusTarget.position + _focusOffset;
             transform.position = Vector3.SmoothDamp(
-                transform.position, targetPos, ref _velocity, smoothTime);
+                transform.position, targetPos, ref _velocity, _smoothTime);
             transform.LookAt(_focusTarget.position);
 
             _focusTimer -= Time.deltaTime;
@@ -90,7 +98,7 @@ namespace Legends.Replay
         void UpdateWideShot()
         {
             transform.position = Vector3.SmoothDamp(
-                transform.position, wideShotPosition, ref _velocity, smoothTime);
+                transform.position, _wideShotPosition, ref _velocity, _smoothTime);
             transform.LookAt(new Vector3(25f, 0f, 2.4f));
         }
     }

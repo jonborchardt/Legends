@@ -6,17 +6,19 @@ namespace Legends.Services
 {
     public class UIInputSetup : MonoBehaviour
     {
-        [SerializeField] InputActionAsset actions;
-
         void Awake()
         {
             var module = GetComponent<InputSystemUIInputModule>();
-            if (module == null || actions == null) return;
+            if (module == null) return;
+
+            // Use the project-level action asset configured in Project Settings > Input System
+            var actions = InputSystem.actions;
+            if (actions == null) return;
 
             var ui = actions.FindActionMap("UI");
             if (ui == null) return;
 
-            module.actionsAsset = actions;
+            module.actionsAsset             = actions;
             module.point                    = Ref(ui, "Point");
             module.leftClick                = Ref(ui, "Click");
             module.rightClick               = Ref(ui, "RightClick");
