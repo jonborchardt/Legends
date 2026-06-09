@@ -3,48 +3,80 @@ using Legends.Data;
 
 namespace Legends.Replay
 {
-    // Creates a 3D athlete GameObject entirely in code — no prefab required.
     public static class AthleteFactory
     {
+        const string CharFbxPath = "Assets/Synty/AnimationBaseLocomotion/Meshes/PolygonSyntyCharacter.fbx";
+        const string MatPath     = "Assets/Synty/AnimationSwordCombat/Samples/Materials/M_Dummy.mat";
+
         static RuntimeAnimatorController _controller;
 
         public static GameObject Spawn(AthleteState athlete, int laneIndex, Transform parent = null)
         {
             var go = new GameObject($"Athlete_{athlete.Name}");
             if (parent != null) go.transform.SetParent(parent, false);
-
             go.transform.position = new Vector3(0f, 0f, laneIndex * 1.2f);
 
             var animator = go.AddComponent<Animator>();
-            var controller = LoadController();
-            if (controller != null)
-                animator.runtimeAnimatorController = controller;
+            var ctl = LoadController();
+            if (ctl != null)
+                animator.runtimeAnimatorController = ctl;
 
-            // Try Synty mesh; fall back to capsule primitive
             var meshGo = LoadSyntyMesh(go.transform)
                       ?? CreatePrimitiveMesh(go.transform);
 
-            var renderer = meshGo.GetComponentInChildren<Renderer>();
-            if (renderer != null)
-                renderer.material = BuildMaterial(laneIndex);
+            ConfigureAvatar(animator, meshGo);
+            ApplyMaterial(meshGo, laneIndex);
 
             go.AddComponent<AthleteAnimator>();
-
             return go;
         }
 
-        static RuntimeAnimatorController LoadController()
+        // Assigns the Humanoid Avatar so retargeting works on the Animator sitting on the parent.
+        static void ConfigureAvatar(Animator animator, GameObject meshGo)
         {
-            if (_controller != null) return _controller;
-            _controller = Resources.Load<RuntimeAnimatorController>("Animators/Athlete");
-            return _controller;
+#if UNITY_EDITOR
+            var avatar = UnityEditor.AssetDatabase.LoadAssetAtPath<Avatar>(CharFbxPath);
+            if (avatar != null) animator.avatar = avatar;
+#else
+            // In builds the FBX is loaded from Resources; extract the Avatar from its Animator.
+            var src = meshGo.GetComponent<Animator>()
+                   ?? meshGo.GetComponentInChildren<Animator>();
+            if (src != null)
+            {
+                animator.avatar = src.avatar;
+                Object.Destroy(src);
+            }
+#endif
         }
 
-        // Attempts to load a Synty SidekickCharacter mesh from Resources.
-        // Returns null if the asset is not present.
+        // Creates a per-lane tinted instance of the Synty Dummy material.
+        static void ApplyMaterial(GameObject meshGo, int laneIndex)
+        {
+            Material baseMat = null;
+#if UNITY_EDITOR
+            baseMat = UnityEditor.AssetDatabase.LoadAssetAtPath<Material>(MatPath);
+#endif
+            if (baseMat == null)
+            {
+                var shader = Shader.Find("Universal Render Pipeline/Lit") ?? Shader.Find("Standard");
+                baseMat = new Material(shader);
+            }
+
+            var mat  = new Material(baseMat);
+            var tint = Color.HSVToRGB((laneIndex * 0.22f) % 1f, 0.60f, 0.95f);
+            mat.SetColor("_BaseColor", tint);
+
+            foreach (var r in meshGo.GetComponentsInChildren<Renderer>())
+                r.sharedMaterial = mat;
+        }
+
         static GameObject LoadSyntyMesh(Transform parent)
         {
-            var prefab = Resources.Load<GameObject>("Meshes/SK_HUMN_BASE_01");
+            GameObject prefab = null;
+#if UNITY_EDITOR
+            prefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>(CharFbxPath);
+#endif
+            prefab ??= Resources.Load<GameObject>("Meshes/PolygonSyntyCharacter");
             if (prefab == null) return null;
             return Object.Instantiate(prefab, parent);
         }
@@ -58,13 +90,11 @@ namespace Legends.Replay
             return capsule;
         }
 
-        static Material BuildMaterial(int laneIndex)
+        static RuntimeAnimatorController LoadController()
         {
-            var shader = Shader.Find("Universal Render Pipeline/Lit")
-                      ?? Shader.Find("Standard");
-            var mat   = new Material(shader);
-            mat.color = Color.HSVToRGB((laneIndex * 0.22f) % 1f, 0.75f, 0.9f);
-            return mat;
+            if (_controller != null) return _controller;
+            _controller = Resources.Load<RuntimeAnimatorController>("Animators/Athlete");
+            return _controller;
         }
     }
 }
