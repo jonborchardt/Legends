@@ -3,9 +3,7 @@
     "rootNamespace": "Legends.Replay",
     "references": [
         "Legends.Data",
-        "Legends.Services",
-        "Unity.Addressables",
-        "Unity.ResourceManager"
+        "Legends.Services"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

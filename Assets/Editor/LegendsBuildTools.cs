@@ -17,17 +17,13 @@ namespace Legends.Editor
         static LegendsBuildTools() => BuildAll();
 
         // Runs before every WebGL / standalone build
-        public void OnPreprocessBuild(BuildReport _)
-        {
-            BuildAll();
-            AddressablesSetup.Register();
-            AddressablesSetup.BuildContent();
-        }
+        public void OnPreprocessBuild(BuildReport _) => BuildAll();
 
         [MenuItem("Tools/Legends/Build All")]
         public static void BuildAll()
         {
             AthleteControllerGenerator.Generate();
+            AthleteResourceBuilder.Build();
             // Add future generators here, e.g.:
             // EnvironmentMeshGenerator.Generate();
         }

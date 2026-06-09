@@ -2,9 +2,7 @@
     "name": "Legends.Editor",
     "rootNamespace": "Legends.Editor",
     "references": [
-        "Legends.Replay",
-        "Unity.Addressables",
-        "Unity.Addressables.Editor"
+        "Legends.Replay"
     ],
     "includePlatforms": [
         "Editor"

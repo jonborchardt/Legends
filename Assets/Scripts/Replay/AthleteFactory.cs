@@ -1,7 +1,5 @@
 using System.Collections;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
-using UnityEngine.ResourceManagement.AsyncOperations;
 using Legends.Data;
 
 namespace Legends.Replay
@@ -12,16 +10,8 @@ namespace Legends.Replay
         static RuntimeAnimatorController _cachedController;
         static Material _cachedMaterial;
 
-#if !UNITY_EDITOR
-        static AsyncOperationHandle<GameObject> _meshHandle;
-        static AsyncOperationHandle<RuntimeAnimatorController> _controllerHandle;
-        static AsyncOperationHandle<Material> _materialHandle;
-#endif
-
-        // Preload both assets before calling Spawn. Call from ReplaySceneController via
-        // yield return StartCoroutine(AthleteFactory.PreloadAsync()).
-        // In editor: AssetDatabase paths load synchronously — no async work needed.
-        // In builds: Addressables async load; WaitForCompletion is forbidden on WebGL.
+        // In editor: AssetDatabase loads synchronously from source paths.
+        // In builds: Resources.Load from Assets/Resources/Athletes/ (populated by AthleteResourceBuilder).
         public static IEnumerator PreloadAsync(AthleteVisualConfig config = null)
         {
             config ??= AthleteVisualConfig.Default();
@@ -30,40 +20,23 @@ namespace Legends.Replay
             _cachedMeshPrefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>(config.MeshEditorPath);
             _cachedController = UnityEditor.AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>(config.ControllerEditorPath);
             _cachedMaterial   = UnityEditor.AssetDatabase.LoadAssetAtPath<Material>(config.MatEditorPath);
-            yield break;
 #else
-            _meshHandle = Addressables.LoadAssetAsync<GameObject>(AddressKeys.AthleteCharacter);
-            yield return _meshHandle;
-            if (_meshHandle.Status == AsyncOperationStatus.Succeeded)
-                _cachedMeshPrefab = _meshHandle.Result;
-            else
-                Debug.LogWarning($"[AthleteFactory] Failed to load mesh '{AddressKeys.AthleteCharacter}' — capsule fallback will be used.");
+            _cachedMeshPrefab = Resources.Load<GameObject>(ResourcePaths.AthleteCharacter);
+            _cachedController = Resources.Load<RuntimeAnimatorController>(ResourcePaths.AthleteController);
+            _cachedMaterial   = Resources.Load<Material>(ResourcePaths.AthleteMaterial);
 
-            _controllerHandle = Addressables.LoadAssetAsync<RuntimeAnimatorController>(AddressKeys.AthleteController);
-            yield return _controllerHandle;
-            if (_controllerHandle.Status == AsyncOperationStatus.Succeeded)
-                _cachedController = _controllerHandle.Result;
-            else
-                Debug.LogWarning($"[AthleteFactory] Failed to load controller '{AddressKeys.AthleteController}' — athletes will have no animations.");
-
-            _materialHandle = Addressables.LoadAssetAsync<Material>(AddressKeys.AthleteMaterial);
-            yield return _materialHandle;
-            if (_materialHandle.Status == AsyncOperationStatus.Succeeded)
-                _cachedMaterial = _materialHandle.Result;
-            else
-                Debug.LogWarning($"[AthleteFactory] Failed to load material '{AddressKeys.AthleteMaterial}' — flat colour fallback will be used.");
+            if (_cachedMeshPrefab == null)
+                Debug.LogWarning($"[AthleteFactory] '{ResourcePaths.AthleteCharacter}' not found in Resources — capsule fallback will be used.");
+            if (_cachedController == null)
+                Debug.LogWarning($"[AthleteFactory] '{ResourcePaths.AthleteController}' not found in Resources — athletes will have no animations.");
+            if (_cachedMaterial == null)
+                Debug.LogWarning($"[AthleteFactory] '{ResourcePaths.AthleteMaterial}' not found in Resources — flat colour fallback will be used.");
 #endif
+            yield break;
         }
 
-        // Release Addressables handles and clear cached assets.
-        // Call from ReplaySceneController.OnDestroy so handles are not leaked across scenes.
         public static void ReleaseHandles()
         {
-#if !UNITY_EDITOR
-            if (_meshHandle.IsValid())       Addressables.Release(_meshHandle);
-            if (_controllerHandle.IsValid()) Addressables.Release(_controllerHandle);
-            if (_materialHandle.IsValid())   Addressables.Release(_materialHandle);
-#endif
             _cachedMeshPrefab = null;
             _cachedController = null;
             _cachedMaterial   = null;
@@ -87,7 +60,7 @@ namespace Legends.Replay
                       ?? CreatePrimitiveMesh(go.transform);
 
             ConfigureAvatar(animator, meshGo, config);
-            ApplyMaterial(meshGo, laneIndex, config);
+            ApplyMaterial(meshGo, laneIndex);
 
             go.AddComponent<AthleteAnimator>();
             return go;
@@ -124,7 +97,7 @@ namespace Legends.Replay
 #endif
         }
 
-        static void ApplyMaterial(GameObject meshGo, int laneIndex, AthleteVisualConfig config)
+        static void ApplyMaterial(GameObject meshGo, int laneIndex)
         {
             Material baseMat = _cachedMaterial;
             if (baseMat == null)

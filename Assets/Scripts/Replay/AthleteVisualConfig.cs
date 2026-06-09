@@ -19,8 +19,8 @@ namespace Legends.Replay
         public static AthleteVisualConfig Default() => new()
         {
             MeshEditorPath       = "Assets/Synty/AnimationBaseLocomotion/Meshes/PolygonSyntyCharacter.fbx",
-            ControllerEditorPath = "Assets/GeneratedArtifacts/Animators/Athlete.controller",
-            MatEditorPath        = "Assets/Synty/AnimationSwordCombat/Samples/Materials/M_Dummy.mat",
+            ControllerEditorPath = "Assets/Resources/Athletes/Athlete.controller",
+            MatEditorPath        = "Assets/Resources/Athletes/M_Dummy.mat",
             LaneSpacing          = 1.2f,
         };
     }
