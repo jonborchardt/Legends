@@ -33,26 +33,47 @@ namespace Legends.UI
             var state       = saveService.Load();
             var nameMap     = BuildNameMap(state);
 
+            const float HeaderH = 80f;
+            const float FooterH = 80f;
+
             var canvas = UIFactory.CreateCanvas("Results");
             var root   = UIFactory.CreatePanel(canvas.transform, "Root", UIStyle.Background);
             UIFactory.FillParent(root.GetComponent<RectTransform>());
 
-            UIFactory.CreateText(root.transform, "Title", "Results", UIStyle.FontTitle);
+            // Title — pinned to top
+            var title   = UIFactory.CreateText(root.transform, "Title", "Results", UIStyle.FontTitle);
+            var titleRt = title.GetComponent<RectTransform>();
+            titleRt.anchorMin = new Vector2(0, 1);
+            titleRt.anchorMax = new Vector2(1, 1);
+            titleRt.offsetMin = new Vector2(16, -HeaderH);
+            titleRt.offsetMax = new Vector2(-16, 0);
+
+            // Button — pinned to bottom
+            var btn   = UIFactory.CreateButton(root.transform, "Back", "Back to Team", OnBack);
+            var btnRt = btn.GetComponent<RectTransform>();
+            btnRt.anchorMin = new Vector2(0, 0);
+            btnRt.anchorMax = new Vector2(1, 0);
+            btnRt.offsetMin = new Vector2(16, 8);
+            btnRt.offsetMax = new Vector2(-16, FooterH - 8);
+
+            // Scroll — fills between title and button
+            Transform scrollContent;
+            var scroll   = UIFactory.CreateScrollView(root.transform, "Scroll", out scrollContent);
+            var scrollRt = scroll.GetComponent<RectTransform>();
+            scrollRt.anchorMin = Vector2.zero;
+            scrollRt.anchorMax = Vector2.one;
+            scrollRt.offsetMin = new Vector2(0, FooterH);
+            scrollRt.offsetMax = new Vector2(0, -HeaderH);
 
             // Rankings
-            UIFactory.CreateText(root.transform, "RankingsHeader", "Final Standings", UIStyle.FontSection);
-            Transform rankContent;
-            var rankScroll = UIFactory.CreateScrollView(root.transform, "RankScroll", out rankContent);
-            rankScroll.GetComponent<RectTransform>().sizeDelta = new Vector2(0, 280f);
-            rankScroll.AddComponent<UnityEngine.UI.LayoutElement>().preferredHeight = 280f;
-
+            UIFactory.CreateText(scrollContent, "RankingsHeader", "Final Standings", UIStyle.FontSection);
             for (int i = 0; i < result.Placements.Count; i++)
             {
                 string name = nameMap.GetValueOrDefault(result.Placements[i], "Unknown");
-                ResultRowFactory.Create(rankContent, name, i + 1);
+                ResultRowFactory.Create(scrollContent, name, i + 1);
             }
 
-            // Notable events
+            // Highlights
             var notable = result.Timeline
                 .Where(e => e.EventType is EventTypes.EggDrop or EventTypes.Surge or EventTypes.Stumble)
                 .Take(3)
@@ -60,20 +81,15 @@ namespace Legends.UI
 
             if (notable.Count > 0)
             {
-                UIFactory.CreateText(root.transform, "EventsHeader", "Highlights", UIStyle.FontSection);
-                Transform evtContent;
-                UIFactory.CreateScrollView(root.transform, "EventScroll", out evtContent);
-
+                UIFactory.CreateText(scrollContent, "EventsHeader", "Highlights", UIStyle.FontSection);
                 foreach (var evt in notable)
                 {
                     string name = nameMap.GetValueOrDefault(evt.AthleteId, "Someone");
                     string text = FormatEvent(evt.EventType, name);
-                    var lbl = UIFactory.CreateText(evtContent, $"Evt_{evt.EventType}", text, UIStyle.FontBody);
+                    var lbl = UIFactory.CreateText(scrollContent, $"Evt_{evt.EventType}", text, UIStyle.FontBody);
                     lbl.color = EventColor(evt.EventType);
                 }
             }
-
-            UIFactory.CreateButton(root.transform, "Back", "Back to Team", OnBack);
 
             return canvas;
         }
