@@ -49,9 +49,10 @@ namespace Legends.UI
 
         void RegisterNavigationHandlers()
         {
-            SceneFlow.GoToMainMenuHandler = () => ShowScreen<MainMenuScreen>();
-            SceneFlow.GoToTeamHubHandler  = () => ShowScreen<TeamHubScreen>();
-            SceneFlow.GoToResultsHandler  = () => ShowScreen<ResultsScreen>();
+            SceneFlow.GoToMainMenuHandler  = () => ShowScreen<MainMenuScreen>();
+            SceneFlow.GoToTeamHubHandler   = () => ShowScreen<TeamHubScreen>();
+            SceneFlow.GoToResultsHandler   = () => ShowScreen<ResultsScreen>();
+            SceneFlow.HideAllScreensHandler = HideAll;
         }
 
         public void ShowScreen<T>() where T : UIScreen, new()
@@ -65,7 +66,7 @@ namespace Legends.UI
             screen.Show();
         }
 
-        void HideAll()
+        public void HideAll()
         {
             foreach (var s in _screens.Values)
                 s.Hide();
