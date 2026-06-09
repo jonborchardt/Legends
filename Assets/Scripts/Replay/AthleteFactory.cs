@@ -5,40 +5,39 @@ namespace Legends.Replay
 {
     public static class AthleteFactory
     {
-        const string CharFbxPath = "Assets/Synty/AnimationBaseLocomotion/Meshes/PolygonSyntyCharacter.fbx";
-        const string MatPath     = "Assets/Synty/AnimationSwordCombat/Samples/Materials/M_Dummy.mat";
-
         static RuntimeAnimatorController _controller;
 
-        public static GameObject Spawn(AthleteState athlete, int laneIndex, Transform parent = null)
+        public static GameObject Spawn(AthleteState athlete, int laneIndex,
+                                       Transform parent = null,
+                                       AthleteVisualConfig config = null)
         {
+            config ??= AthleteVisualConfig.Default();
+
             var go = new GameObject($"Athlete_{athlete.Name}");
             if (parent != null) go.transform.SetParent(parent, false);
-            go.transform.position = new Vector3(0f, 0f, laneIndex * 1.2f);
+            go.transform.position = new Vector3(0f, 0f, laneIndex * config.LaneSpacing);
 
             var animator = go.AddComponent<Animator>();
             var ctl = LoadController();
             if (ctl != null)
                 animator.runtimeAnimatorController = ctl;
 
-            var meshGo = LoadSyntyMesh(go.transform)
+            var meshGo = LoadMesh(go.transform, config)
                       ?? CreatePrimitiveMesh(go.transform);
 
-            ConfigureAvatar(animator, meshGo);
-            ApplyMaterial(meshGo, laneIndex);
+            ConfigureAvatar(animator, meshGo, config);
+            ApplyMaterial(meshGo, laneIndex, config);
 
             go.AddComponent<AthleteAnimator>();
             return go;
         }
 
-        // Assigns the Humanoid Avatar so retargeting works on the Animator sitting on the parent.
-        static void ConfigureAvatar(Animator animator, GameObject meshGo)
+        static void ConfigureAvatar(Animator animator, GameObject meshGo, AthleteVisualConfig config)
         {
 #if UNITY_EDITOR
-            var avatar = UnityEditor.AssetDatabase.LoadAssetAtPath<Avatar>(CharFbxPath);
+            var avatar = UnityEditor.AssetDatabase.LoadAssetAtPath<Avatar>(config.MeshEditorPath);
             if (avatar != null) animator.avatar = avatar;
 #else
-            // In builds the FBX is loaded from Resources; extract the Avatar from its Animator.
             var src = meshGo.GetComponent<Animator>()
                    ?? meshGo.GetComponentInChildren<Animator>();
             if (src != null)
@@ -49,12 +48,11 @@ namespace Legends.Replay
 #endif
         }
 
-        // Creates a per-lane tinted instance of the Synty Dummy material.
-        static void ApplyMaterial(GameObject meshGo, int laneIndex)
+        static void ApplyMaterial(GameObject meshGo, int laneIndex, AthleteVisualConfig config)
         {
             Material baseMat = null;
 #if UNITY_EDITOR
-            baseMat = UnityEditor.AssetDatabase.LoadAssetAtPath<Material>(MatPath);
+            baseMat = UnityEditor.AssetDatabase.LoadAssetAtPath<Material>(config.MatEditorPath);
 #endif
             if (baseMat == null)
             {
@@ -70,13 +68,13 @@ namespace Legends.Replay
                 r.sharedMaterial = mat;
         }
 
-        static GameObject LoadSyntyMesh(Transform parent)
+        static GameObject LoadMesh(Transform parent, AthleteVisualConfig config)
         {
             GameObject prefab = null;
 #if UNITY_EDITOR
-            prefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>(CharFbxPath);
+            prefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>(config.MeshEditorPath);
 #endif
-            prefab ??= Resources.Load<GameObject>("Meshes/PolygonSyntyCharacter");
+            prefab ??= Resources.Load<GameObject>(config.MeshRuntimePath);
             if (prefab == null) return null;
             return Object.Instantiate(prefab, parent);
         }
