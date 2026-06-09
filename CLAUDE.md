@@ -13,7 +13,8 @@ The project uses **Code-First Authoring** (Programmatic Scene Construction). C# 
 **The "never edit in editor" rule** — for any UI, prefab, or scene content change:
 1. Edit the relevant `*Screen.cs`, `*Factory.cs`, or generator script
 2. Hit Play — the change is live immediately
-3. AnimatorController only: run `Tools > Legends > Regenerate Athlete Controller`
+
+Generated artifacts (AnimatorController, etc.) rebuild automatically on script recompile and before every build via `LegendsBuildTools`. To force a rebuild: `Tools > Legends > Build All`.
 
 PSC rules:
 

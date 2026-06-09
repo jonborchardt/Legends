@@ -12,10 +12,7 @@ The project uses **Programmatic Scene Construction (PSC)**: all UI and 3D object
 1. Edit the relevant `*Screen.cs`, `*Factory.cs`, or generator script
 2. Hit Play — changes are live immediately
 
-**To change animation states:**
-1. Edit `Assets/Editor/AthleteControllerGenerator.cs`
-2. Run `Tools > Legends > Regenerate Athlete Controller` in the Unity Editor
-3. Commit the generated `Assets/Resources/Animators/Athlete.controller`
+**Generated artifacts** (AnimatorController, etc.) rebuild automatically whenever scripts recompile and before every build. To force a rebuild: `Tools > Legends > Build All`. To change animation states, edit `Assets/Editor/AthleteControllerGenerator.cs` — the controller regenerates on the next compile.
 
 **Key entry points:**
 

@@ -7,7 +7,7 @@ namespace Legends.Editor
 {
     // Generates Assets/Resources/Animators/Athlete.controller from code.
     // The .controller is a regeneratable artifact — never hand-edit it.
-    // Run: Tools > Legends > Regenerate Athlete Controller
+    // Called automatically by LegendsBuildTools on compile and before every build.
     public static class AthleteControllerGenerator
     {
         const string OutputPath = "Assets/Resources/Animators/Athlete.controller";
@@ -20,7 +20,6 @@ namespace Legends.Editor
         const string ClipCelebrate = "Assets/Synty/AnimationSwordCombat/Animations/Polygon/Attack/HeavyFlourish01/A_Attack_HeavyFlourish01_Sword.fbx";
         const string ClipFail      = "Assets/Synty/AnimationSwordCombat/Animations/Polygon/Hit/KnockDown/A_KnockDown_Begin_Sword.fbx";
 
-        [MenuItem("Tools/Legends/Regenerate Athlete Controller")]
         public static void Generate()
         {
             System.IO.Directory.CreateDirectory("Assets/Resources/Animators");
