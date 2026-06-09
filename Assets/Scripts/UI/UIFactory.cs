@@ -1,7 +1,9 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Events;
+using UnityEngine.InputSystem.UI;
 using TMPro;
+using Legends.Services;
 
 namespace Legends.UI
 {
@@ -266,7 +268,8 @@ namespace Legends.UI
             var es = new GameObject("EventSystem");
             es.transform.SetParent(ScreenRegistry.Instance.CanvasParent, false);
             es.AddComponent<UnityEngine.EventSystems.EventSystem>();
-            es.AddComponent<UnityEngine.EventSystems.StandaloneInputModule>();
+            es.AddComponent<InputSystemUIInputModule>();
+            es.AddComponent<UIInputSetup>();
         }
     }
 }
