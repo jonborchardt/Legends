@@ -6,24 +6,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Olympic Manager MVP — a WebGL game on GitHub Pages. Player manages a fantasy athletic team and watches a 3D replay of a simulated Dragon Egg Relay event. Unity project targeting WebGL, no backend.
 
-## Active Refactor: Programmatic Scene Construction (PSC)
+## Architecture: Programmatic Scene Construction (PSC)
 
-The project is undergoing a **Code-First Authoring** refactor (also called Programmatic Scene
-Construction). The goal: C# code is the sole authoritative source for all scene structure, UI
-layout, and runtime objects. The Unity Editor is a build host only — not an authoring tool.
-
-**End state: when the refactor is complete, the Unity Editor is never required for development.**
-All future work is written as C# and takes effect on the next Play/build. No inspector, no scene
-hierarchy, no prefab editing mode — ever.
+The project uses **Code-First Authoring** (Programmatic Scene Construction). C# code is the sole authoritative source for all scene structure, UI layout, and runtime objects. The Unity Editor is a build host only — not an authoring tool.
 
 **The "never edit in editor" rule** — for any UI, prefab, or scene content change:
 1. Edit the relevant `*Screen.cs`, `*Factory.cs`, or generator script
 2. Hit Play — the change is live immediately
 3. AnimatorController only: run `Tools > Legends > Regenerate Athlete Controller`
 
-Refactor plan: [Plans/refactor/MASTER.md](Plans/refactor/MASTER.md)
-
-PSC rules (in addition to the non-negotiables below):
+PSC rules:
 
 | Rule | Constraint |
 |---|---|
@@ -32,7 +24,33 @@ PSC rules (in addition to the non-negotiables below):
 | No `[SerializeField]` drag-and-drop | All references assigned in code |
 | No inspector-assigned materials | Materials created with `new Material(Shader.Find(...))` |
 | No hand-edited .asset files | EventConfig created by `EventConfigFactory`; AnimatorController by generator script |
-| No hand-placed GameObjects in scenes | Scenes contain only `SceneBootstrap`; everything else is spawned |
+| No hand-placed GameObjects in scenes | Scenes contain only a single bootstrap MonoBehaviour; everything else is spawned |
+
+## Key Files
+
+| What you want to change | File to edit |
+|---|---|
+| Main menu layout / buttons | [Assets/Scripts/UI/Screens/MainMenuScreen.cs](Assets/Scripts/UI/Screens/MainMenuScreen.cs) |
+| Team hub layout / athlete cards | [Assets/Scripts/UI/Screens/TeamHubScreen.cs](Assets/Scripts/UI/Screens/TeamHubScreen.cs), [AthleteCardFactory.cs](Assets/Scripts/UI/Factories/AthleteCardFactory.cs) |
+| Results screen / row layout | [Assets/Scripts/UI/Screens/ResultsScreen.cs](Assets/Scripts/UI/Screens/ResultsScreen.cs), [ResultRowFactory.cs](Assets/Scripts/UI/Factories/ResultRowFactory.cs) |
+| UI colours / font sizes | [Assets/Scripts/UI/UIStyle.cs](Assets/Scripts/UI/UIStyle.cs) |
+| UI layout primitives (buttons, panels, scroll views) | [Assets/Scripts/UI/UIFactory.cs](Assets/Scripts/UI/UIFactory.cs) |
+| 3D athlete visual / material | [Assets/Scripts/Replay/AthleteFactory.cs](Assets/Scripts/Replay/AthleteFactory.cs) |
+| Athlete animation states | [Assets/Editor/AthleteControllerGenerator.cs](Assets/Editor/AthleteControllerGenerator.cs) → regenerate |
+| Event config (segments, timing) | [Assets/Scripts/Simulation/EventConfigFactory.cs](Assets/Scripts/Simulation/EventConfigFactory.cs) |
+| Scene navigation routes | [Assets/Scripts/Services/SceneFlow.cs](Assets/Scripts/Services/SceneFlow.cs) |
+| Replay camera behaviour | [Assets/Scripts/Replay/ReplayCameraController.cs](Assets/Scripts/Replay/ReplayCameraController.cs) |
+
+## Scenes
+
+Only two scenes exist in the build:
+
+| Scene | Purpose |
+|---|---|
+| `Boot.unity` | Entry point. ScreenRegistry auto-bootstraps; BootController triggers main menu. |
+| `EventReplay.unity` | 3D replay. ReplaySceneController wires up ReplayDirector and camera in code. |
+
+All UI screens (MainMenu, TeamHub, Results) are canvas GameObjects built in code by ScreenRegistry — no separate scene files.
 
 ## Architectural Non-Negotiables
 

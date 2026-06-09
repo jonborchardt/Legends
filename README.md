@@ -4,6 +4,32 @@ Olympic Manager MVP — a WebGL game on GitHub Pages. Player manages a fantasy a
 
 No backend. No multiplayer. No cloud saves. All state in browser localStorage.
 
+## Development
+
+The project uses **Programmatic Scene Construction (PSC)**: all UI and 3D objects are built entirely in C#. The Unity Editor is used only to run Play mode and build WebGL — never to place objects or wire up inspectors.
+
+**To change any UI or game object:**
+1. Edit the relevant `*Screen.cs`, `*Factory.cs`, or generator script
+2. Hit Play — changes are live immediately
+
+**To change animation states:**
+1. Edit `Assets/Editor/AthleteControllerGenerator.cs`
+2. Run `Tools > Legends > Regenerate Athlete Controller` in the Unity Editor
+3. Commit the generated `Assets/Resources/Animators/Athlete.controller`
+
+**Key entry points:**
+
+| What | Where |
+|---|---|
+| Main menu, team hub, results screens | `Assets/Scripts/UI/Screens/` |
+| UI layout helpers (buttons, panels, etc.) | `Assets/Scripts/UI/UIFactory.cs` |
+| Colours and font sizes | `Assets/Scripts/UI/UIStyle.cs` |
+| 3D athlete visual creation | `Assets/Scripts/Replay/AthleteFactory.cs` |
+| Race simulation | `Assets/Scripts/Simulation/DragonEggRelaySimulator.cs` |
+| Scene/screen navigation | `Assets/Scripts/Services/SceneFlow.cs` |
+
+---
+
 ## Deployment Setup (one-time)
 
 Unity Personal licenses can't be exported, so CI activation requires a manual flow:
