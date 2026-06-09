@@ -5,12 +5,14 @@ using UnityEngine;
 
 namespace Legends.Editor
 {
-    // Generates Assets/Resources/Animators/Athlete.controller from code.
+    // Generates Assets/GeneratedArtifacts/Animators/Athlete.controller from code.
     // The .controller is a regeneratable artifact — never hand-edit it.
     // Called automatically by LegendsBuildTools on compile and before every build.
     public static class AthleteControllerGenerator
     {
-        const string OutputPath = "Assets/Resources/Animators/Athlete.controller";
+        // Output is outside Resources/ so it can be registered as an Addressable asset.
+        // Addressables address: AddressKeys.AthleteController ("athlete_controller").
+        public const string OutputPath = "Assets/GeneratedArtifacts/Animators/Athlete.controller";
 
         // Synty AnimationBaseLocomotion + AnimationSwordCombat clip sources
         const string ClipIdle      = "Assets/Synty/AnimationBaseLocomotion/Animations/Polygon/Masculine/Idle/A_Idle_Standing_Masc.fbx";
@@ -22,7 +24,7 @@ namespace Legends.Editor
 
         public static void Generate()
         {
-            System.IO.Directory.CreateDirectory("Assets/Resources/Animators");
+            System.IO.Directory.CreateDirectory("Assets/GeneratedArtifacts/Animators");
 
             var controller = AnimatorController.CreateAnimatorControllerAtPath(OutputPath);
             var root       = controller.layers[0].stateMachine;

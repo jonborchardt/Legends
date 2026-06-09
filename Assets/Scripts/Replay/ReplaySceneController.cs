@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Legends.Data;
@@ -11,14 +12,16 @@ namespace Legends.Replay
     {
         ReplayDirector _director;
 
-        void Start()
+        IEnumerator Start()
         {
             var result = GetResult();
             if (result == null)
             {
                 SceneFlow.GoToTeamHub();
-                return;
+                yield break;
             }
+
+            yield return StartCoroutine(AthleteFactory.PreloadAsync());
 
             var athletes = LoadAthletes();
 
@@ -30,6 +33,11 @@ namespace Legends.Replay
 
             _director.OnReplayComplete += OnReplayComplete;
             _director.Load(result, athletes);
+        }
+
+        void OnDestroy()
+        {
+            AthleteFactory.ReleaseHandles();
         }
 
         static EventResult GetResult()
