@@ -25,10 +25,11 @@ namespace Legends.UI
             return row;
         }
 
-        static string Ordinal(int n) => n switch
+        static string Ordinal(int n)
         {
-            1 => "1st", 2 => "2nd", 3 => "3rd", _ => $"{n}th"
-        };
+            if (n % 100 is 11 or 12 or 13) return $"{n}th";
+            return (n % 10) switch { 1 => $"{n}st", 2 => $"{n}nd", 3 => $"{n}rd", _ => $"{n}th" };
+        }
 
         static UnityEngine.Color RowColor(int rank) => rank switch
         {

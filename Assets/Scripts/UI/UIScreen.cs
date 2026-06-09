@@ -10,7 +10,7 @@ namespace Legends.UI
         public virtual void Show()
         {
             if (!IsBuilt) Root = Build();
-            Root.SetActive(true);
+            Root?.SetActive(true);
         }
 
         public void Hide()

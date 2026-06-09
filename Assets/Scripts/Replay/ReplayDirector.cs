@@ -194,6 +194,7 @@ namespace Legends.Replay
             var capsule = GameObject.CreatePrimitive(PrimitiveType.Capsule);
             capsule.transform.SetParent(go.transform, false);
             capsule.transform.localPosition = new Vector3(0f, 1f, 0f);
+            UnityEngine.Object.Destroy(capsule.GetComponent<CapsuleCollider>());
             go.AddComponent<AthleteAnimator>();
             return go;
         }

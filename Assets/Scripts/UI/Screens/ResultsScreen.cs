@@ -14,7 +14,7 @@ namespace Legends.UI
         {
             if (IsBuilt)
             {
-                Object.Destroy(Root);
+                Object.DestroyImmediate(Root);
                 Root = null;
             }
             base.Show();
@@ -26,7 +26,7 @@ namespace Legends.UI
             if (result == null)
             {
                 ScreenRegistry.Instance.ShowScreen<TeamHubScreen>();
-                return new GameObject("Results_Empty");
+                return null;
             }
 
             var saveService = new PlayerPrefsSaveService();

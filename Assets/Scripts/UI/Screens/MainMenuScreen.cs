@@ -11,6 +11,12 @@ namespace Legends.UI
     {
         Button _continueButton;
 
+        public override void Show()
+        {
+            base.Show();
+            RefreshContinue();
+        }
+
         protected override GameObject Build()
         {
             var canvas = UIFactory.CreateCanvas("MainMenu");

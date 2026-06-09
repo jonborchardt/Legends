@@ -17,7 +17,7 @@ namespace Legends.UI
             if (gameState == null)
             {
                 ScreenRegistry.Instance.ShowScreen<MainMenuScreen>();
-                return new GameObject("TeamHub_Empty");
+                return null;
             }
 
             var canvas = UIFactory.CreateCanvas("TeamHub");

@@ -18,7 +18,8 @@ namespace Legends.Services
 
         public static void GoToResults()
         {
-            SceneManager.UnloadSceneAsync("Replay3D");
+            if (SceneManager.GetSceneByName("Replay3D").isLoaded)
+                SceneManager.UnloadSceneAsync("Replay3D");
             GoToResultsHandler?.Invoke();
         }
     }
