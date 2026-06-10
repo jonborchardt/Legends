@@ -133,11 +133,12 @@ namespace Legends.UI
             scroll.horizontal = false;
             scroll.vertical   = true;
 
-            // Viewport
+            // Viewport — RectMask2D clips by rect math in the shader; avoids the stencil-write
+            // issue where a zero-alpha Image causes Mask to skip the stencil buffer entirely,
+            // making all scroll content invisible.
             var viewport = new GameObject("Viewport");
             viewport.transform.SetParent(go.transform, false);
-            viewport.AddComponent<Image>().color = new Color(0, 0, 0, 0);
-            viewport.AddComponent<Mask>().showMaskGraphic = false;
+            viewport.AddComponent<RectMask2D>();
             var vpRt = viewport.GetComponent<RectTransform>();
             FillParent(vpRt);
 
@@ -147,7 +148,7 @@ namespace Legends.UI
             var vl = contentGo.AddComponent<VerticalLayoutGroup>();
             vl.spacing            = 6f;
             vl.childControlWidth  = true;
-            vl.childControlHeight = false;
+            vl.childControlHeight = true;
             vl.childForceExpandWidth  = true;
             vl.childForceExpandHeight = false;
             vl.padding = new RectOffset(8, 8, 8, 8);

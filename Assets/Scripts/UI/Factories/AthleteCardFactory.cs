@@ -24,6 +24,7 @@ namespace Legends.UI
             // VLG + CSF live directly on the card panel — no inner GameObject, no deferred-destroy conflict.
             var card = UIFactory.CreatePanel(parent, $"Card_{athlete.Name}", UIStyle.Surface);
 
+            // Height driven by the scroll content VLG (childControlHeight=true) — no card-level CSF.
             var vl = card.AddComponent<VerticalLayoutGroup>();
             vl.spacing               = 4f;
             vl.childControlWidth     = true;
@@ -31,9 +32,6 @@ namespace Legends.UI
             vl.childForceExpandWidth  = true;
             vl.childForceExpandHeight = false;
             vl.padding = new RectOffset(16, 16, 16, 16);
-
-            card.AddComponent<ContentSizeFitter>().verticalFit =
-                ContentSizeFitter.FitMode.PreferredSize;
 
             UIFactory.CreateText(card.transform, "Name", athlete.Name, UIStyle.FontSection);
 
